@@ -7,25 +7,47 @@
       this.pool = pool;
     }
 
-    Item.prototype.get = function () {
-      for (var key in this.pool.drivers) {
-        var driver = this.pool.drivers[key];
-        var value = driver.get(this.key);
+    Item.prototype._load_ = function () {
+      if (!this._loaded_) {
+        this._loaded_ = true;
 
-        if (value) {
-          return value.value;
+        for (var key in this.pool.drivers) {
+          var driver = this.pool.drivers[key];
+          var value = driver.get(this.key);
+
+          if (value) {
+            this.value = value.value;
+            this.expiration = value.expiration;
+            return this;
+          }
         }
+
+        this.value = null;
+        this.expiration = false;
       }
 
-      return null;
+      return this;
+    };
+
+    Item.prototype.get = function () {
+      return this._load_().value;
     };
 
     Item.prototype.set = function (value, expiration) {
       var that = this;
 
+      this._loaded_ = false;
+
       this.pool.drivers.reverse().forEach(function (driver) {
         driver.put(that.key, value, expiration);
       });
+    };
+
+    Item.prototype.isMiss = function () {
+      this._load_();
+
+      console.log(this.expiration);
+      return typeof(this.expiration) === 'number' && this.expiration < Date.now();
     };
 
     return Item;
@@ -63,7 +85,12 @@
 
     Ephemeral.prototype.put = function (key, value, expiration) {
       if (!JSON.stringify(value)) {
-        throw new TypeError('Invalid value! Only serializables values can be cached');
+        throw new TypeError('Only serializables values can be cached');
+      }
+
+      if (typeof(expiration) === 'number') {
+        expiration *= 1000;
+        expiration += Date.now();
       }
 
       this._cache_[key] = { value: value, expiration: expiration };

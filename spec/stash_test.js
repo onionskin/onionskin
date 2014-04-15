@@ -46,6 +46,20 @@ describe('Stash', function () {
         expect(foo.get()).to.be.equal('bar');
       });
     });
+
+    context('#isMiss', function () {
+      it('should return true if cache is expired', function () {
+        foo.set('bar', 0);
+        setTimeout(function () {
+          expect(foo.isMiss()).to.be.true;
+        }, 1)
+      });
+
+      it('should return false when it is still valid', function () {
+        foo.set('bar', 100);
+        expect(foo.isMiss()).to.be.false;
+      });
+    });
   });
 
   context('::Drivers', function () {
