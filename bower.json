@@ -1,0 +1,23 @@
+{
+  "name": "Stash.js",
+  "version": "0.0.1",
+  "authors": [
+    "Tadeu Zagallo <tadeuzagallo@gmail.com>"
+  ],
+  "description": "Cache manager library for javascript",
+  "keywords": [
+    "cache",
+    "manager",
+    "library",
+    "javascript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ]
+}
