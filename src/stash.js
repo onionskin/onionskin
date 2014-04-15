@@ -12,7 +12,6 @@
         var driver = this.pool.drivers[key];
         var value = driver.get(this.key);
 
-          console.log(driver);
         if (value) {
           return value.value;
         }
@@ -63,6 +62,10 @@
     };
 
     Ephemeral.prototype.put = function (key, value, expiration) {
+      if (!JSON.stringify(value)) {
+        throw new TypeError('Invalid value! Only serializables values can be cached');
+      }
+
       this._cache_[key] = { value: value, expiration: expiration };
     }
 

@@ -78,6 +78,12 @@ describe('Stash', function () {
           driver.put('foo', 'bar');
           expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
         });
+
+        it('should throw if value is not serializable', function () {
+          expect(function () {
+            driver.put('foo', function () {});
+          }).to.throw(TypeError);
+        });
       });
     });
   });
