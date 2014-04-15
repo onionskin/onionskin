@@ -59,6 +59,14 @@ describe('Stash', function () {
         foo.set('bar', 100);
         expect(foo.isMiss()).to.be.false;
       });
+
+      it('should accept an expiration Date', function () {
+        foo.set('bar', new Date(Date.now() + 1000));
+        expect(foo.isMiss()).to.be.false;
+
+        foo.set('bar', new Date(Date.now() - 100));
+        expect(foo.isMiss()).to.be.true;
+      });
     });
 
     context('#clear', function () {

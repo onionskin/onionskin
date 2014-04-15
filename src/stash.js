@@ -96,6 +96,8 @@
       if (typeof(expiration) === 'number') {
         expiration *= 1000;
         expiration += Date.now();
+      } else if (expiration instanceof Date) {
+        expiration = expiration.getTime();
       }
 
       this._cache_[key] = { value: value, expiration: expiration };
