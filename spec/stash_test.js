@@ -60,6 +60,14 @@ describe('Stash', function () {
         expect(foo.isMiss()).to.be.false;
       });
     });
+
+    context('#clear', function () {
+      it('should immediately invalidate a key', function () {
+        foo.set('bar', 1000);
+        foo.clear();
+        expect(foo.isMiss()).to.be.true;
+      });
+    });
   });
 
   context('::Drivers', function () {

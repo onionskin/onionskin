@@ -46,8 +46,13 @@
     Item.prototype.isMiss = function () {
       this._load_();
 
-      console.log(this.expiration);
       return typeof(this.expiration) === 'number' && this.expiration < Date.now();
+    };
+
+    Item.prototype.clear = function () {
+      this._load_();
+
+      this.set(this.value, -1);
     };
 
     return Item;
