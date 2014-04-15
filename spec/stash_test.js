@@ -77,17 +77,15 @@ describe('Stash', function () {
       });
 
 
-      context('#get', function () {
-        var driver = new Stash.Drivers.Ephemeral();
+      var driver = new Stash.Drivers.Ephemeral();
 
+      context('#get', function () {
         it('should return null for nonexisting keys', function () {
           expect(driver.get('foo')).to.be.null;
         });
       });
 
       context('#put', function () {
-        var driver = new Stash.Drivers.Ephemeral();
-
         it('should store a value', function () {
           driver.put('foo', 'bar');
           expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
@@ -97,6 +95,15 @@ describe('Stash', function () {
           expect(function () {
             driver.put('foo', function () {});
           }).to.throw(TypeError);
+        });
+      });
+
+      context('#delete', function () {
+        it('should delete a key', function () {
+          driver.put('foo', 'bar');
+          driver.delete('foo');
+
+          expect(driver.get('foo')).to.be.null;
         });
       });
     });

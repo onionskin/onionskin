@@ -94,7 +94,11 @@
       }
 
       this._cache_[key] = { value: value, expiration: expiration };
-    }
+    };
+
+    Ephemeral.prototype.delete = function (key) {
+      this._cache_[key] = null;
+    };
 
     return Ephemeral;
   })();
