@@ -83,45 +83,47 @@ describe('Stash', function () {
       expect(Stash.Drivers).to.be.a('object');
     });
 
-    context('::Ephemeral', function () {
-      it('should contain an Ephemeral driver', function () {
-        expect(Stash.Drivers.Ephemeral).to.be.an('function');
-      });
-
-      it('should be a constructor', function () {
-        expect(new Stash.Drivers.Ephemeral()).to.be.an.instanceof(Stash.Drivers.Ephemeral);
-      });
-
-
-      var driver = new Stash.Drivers.Ephemeral();
-
-      context('#get', function () {
-        it('should return null for nonexisting keys', function () {
-          expect(driver.get('foo')).to.be.null;
-        });
-      });
-
-      context('#put', function () {
-        it('should store a value', function () {
-          driver.put('foo', 'bar');
-          expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
+    
+    for (var driverName in Stash.Drivers) {
+      context('::' + driverName, function () {
+        it('should contain an ' + driverName + ' driver', function () {
+          expect(Stash.Drivers[driverName]).to.be.an('function');
         });
 
-        it('should throw if value is not serializable', function () {
-          expect(function () {
-            driver.put('foo', function () {});
-          }).to.throw(TypeError);
+        var driver = new Stash.Drivers[driverName]();
+
+        it('should be a constructor', function () {
+          expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);
+        });
+
+        context('#get', function () {
+          it('should return null for nonexisting keys', function () {
+            expect(driver.get('foo')).to.be.null;
+          });
+        });
+
+        context('#put', function () {
+          it('should store a value', function () {
+            driver.put('foo', 'bar');
+            expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
+          });
+
+          it('should throw if value is not serializable', function () {
+            expect(function () {
+              driver.put('foo', function () {});
+            }).to.throw(TypeError);
+          });
+        });
+
+        context('#delete', function () {
+          it('should delete a key', function () {
+            driver.put('foo', 'bar');
+            driver.delete('foo');
+
+            expect(driver.get('foo')).to.be.null;
+          });
         });
       });
-
-      context('#delete', function () {
-        it('should delete a key', function () {
-          driver.put('foo', 'bar');
-          driver.delete('foo');
-
-          expect(driver.get('foo')).to.be.null;
-        });
-      });
-    });
+    }
   });
 });
