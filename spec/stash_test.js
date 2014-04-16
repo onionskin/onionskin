@@ -93,7 +93,7 @@ describe('Stash', function () {
       it('should set cache as locked', function () {
         foo.lock();
         expect(foo.pool.drivers[0].get(foo.key).locked)
-          .to.be.false;
+          .to.be.true;
       });
     });
   });
