@@ -5,25 +5,23 @@
     function Item(key, pool) {
       this.key = key;
       this.pool = pool;
+      this.value = null;
+      this.expiration = false;
     }
 
     Item.prototype._load_ = function () {
       if (!this._loaded_) {
         this._loaded_ = true;
+        var that = this;
 
-        for (var key in this.pool.drivers) {
-          var driver = this.pool.drivers[key];
-          var value = driver.get(this.key);
+        var value = this.pool.drivers.reduce(function (a, b) {
+          return a || b.get(that.key);
+        }, false);
 
-          if (value) {
-            this.value = value.value;
-            this.expiration = value.expiration;
-            return this;
-          }
+        if (value) {
+          this.value = value.value;
+          this.expiration = value.expiration;
         }
-
-        this.value = null;
-        this.expiration = false;
       }
 
       return this;
