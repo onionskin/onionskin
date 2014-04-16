@@ -108,10 +108,9 @@ describe('Stash', function () {
           });
 
           it('should return true', function () {
-            foo.set('bar', 0);
-            foo.clear();
-            foo.get(Stash.Item.SP_NONE);
+            foo.set('bar', -1);
             foo.lock();
+            foo.get(Stash.Item.SP_NONE);
             expect(foo.isMiss()).to.be.true;
           });
         });
