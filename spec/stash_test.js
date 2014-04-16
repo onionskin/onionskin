@@ -147,6 +147,7 @@ describe('Stash', function () {
           });
 
           var driver = new Stash.Drivers[driverName]();
+          driver.flush();
 
           it('should be a constructor', function () {
             expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);

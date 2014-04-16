@@ -118,6 +118,10 @@
       this._cache_[key] = null;
     };
 
+    Ephemeral.prototype.flush = function () {
+      this._cache_ = {};
+    }
+
     return Ephemeral;
   })();
 
