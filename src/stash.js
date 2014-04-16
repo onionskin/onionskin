@@ -125,5 +125,42 @@
     return Ephemeral;
   })();
 
+  Stash.Drivers.LocalStorage = (function () {
+    function LocalStorage (namespace) {
+      this.namespace = namespace || 'stash';
+      this._loadCache_();
+    }
+
+    LocalStorage.prototype._loadCache_ = function () {
+      var saved = localStorage.getItem(this.namespace);
+
+      this._cache_ = !!saved ? JSON.parse(saved) : {};
+    };
+
+    LocalStorage.prototype._commit_ = function () {
+      localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
+    };
+
+    LocalStorage.prototype.get = function (key) {
+      return this._cache_[key] || null;
+    };
+
+    LocalStorage.prototype.put = function (key, value, expiration) {
+      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration);
+      this._commit_();
+    };
+
+    LocalStorage.prototype.delete = function (key) {
+      this._cache_[key] = null;
+    };
+
+    LocalStorage.prototype.flush = function () {
+      this._cache_ = {};
+      this._commit_();
+    };
+
+    return LocalStorage;
+  })();
+
   exports.Stash = Stash;
 })(window);
