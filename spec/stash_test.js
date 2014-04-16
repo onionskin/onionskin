@@ -124,10 +124,12 @@ describe('Stash', function () {
 
       context('#assemble', function () {
         it('should return an object with value and expiration', function () {
-          expect(Stash.Drivers.Utils.assemble('foo', 100))
+          var date = new Date();
+
+          expect(Stash.Drivers.Utils.assemble('foo', date))
             .to.be.deep.equal({
               value: 'foo',
-              expiration: Stash.Drivers.Utils.calculateExpiration(100)
+              expiration: Stash.Drivers.Utils.calculateExpiration(date)
             });
         });
       });
