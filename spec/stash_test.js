@@ -83,47 +83,102 @@ describe('Stash', function () {
       expect(Stash.Drivers).to.be.a('object');
     });
 
-    
-    for (var driverName in Stash.Drivers) {
-      context('::' + driverName, function () {
-        it('should contain an ' + driverName + ' driver', function () {
-          expect(Stash.Drivers[driverName]).to.be.an('function');
+    context('::Utils', function () {
+      it('should be an object', function () {
+        expect(Stash.Drivers.Utils).to.be.an.object;
+      });
+
+      context('#validateValue', function () {
+        it('should not raise an exception for objects', function () {
+          expect(function () {
+            Stash.Drivers.Utils.validateValue({});
+          }).not.to.throw;
         });
 
-        var driver = new Stash.Drivers[driverName]();
-
-        it('should be a constructor', function () {
-          expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);
-        });
-
-        context('#get', function () {
-          it('should return null for nonexisting keys', function () {
-            expect(driver.get('foo')).to.be.null;
-          });
-        });
-
-        context('#put', function () {
-          it('should store a value', function () {
-            driver.put('foo', 'bar');
-            expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
-          });
-
-          it('should throw if value is not serializable', function () {
-            expect(function () {
-              driver.put('foo', function () {});
-            }).to.throw(TypeError);
-          });
-        });
-
-        context('#delete', function () {
-          it('should delete a key', function () {
-            driver.put('foo', 'bar');
-            driver.delete('foo');
-
-            expect(driver.get('foo')).to.be.null;
-          });
+        it('should throw for functions', function () {
+          expect(function () {
+            Stash.Drivers.Utils.validateValue(function () {});
+          }).to.throw;
         });
       });
+
+      context('#calculateExpiration', function () {
+        it('should return false for false expiration', function () {
+          expect(Stash.Drivers.Utils.calculateExpiration(false)).to.be.false;
+        });
+
+        it('should return the time for Date values', function () {
+          var date = new Date();
+
+          expect(Stash.Drivers.Utils.calculateExpiration(date))
+            .to.be.equal(date.getTime());
+        });
+
+        it('should increase Date.now by seconds', function () {
+          var date = Date.now() + 100 * 1000;
+
+          expect(Stash.Drivers.Utils.calculateExpiration(100) - date)
+            .to.be.lt(100);
+        });
+      });
+
+      context('#assemble', function () {
+        it('should return an object with value and expiration', function () {
+          expect(Stash.Drivers.Utils.assemble('foo', 100))
+            .to.be.deep.equal({
+              value: 'foo',
+              expiration: Stash.Drivers.Utils.calculateExpiration(100)
+            });
+        });
+      });
+    });
+    
+    for (var driverName in Stash.Drivers) {
+      if (driverName === 'Utils') {
+        continue;
+      }
+
+      (function (driverName) {
+        context('::' + driverName, function () {
+          it('should contain an ' + driverName + ' driver', function () {
+            expect(Stash.Drivers[driverName]).to.be.an('function');
+          });
+
+          var driver = new Stash.Drivers[driverName]();
+
+          it('should be a constructor', function () {
+            expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);
+          });
+
+          context('#get', function () {
+            it('should return null for nonexisting keys', function () {
+              expect(driver.get('foo')).to.be.null;
+            });
+          });
+
+          context('#put', function () {
+            it('should store a value', function () {
+              driver.put('foo', 'bar');
+              expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
+            });
+
+            it('should throw if value is not serializable', function () {
+              expect(function () {
+                driver.put('foo', function () {});
+              }).to.throw(TypeError);
+            });
+          });
+
+          context('#delete', function () {
+            it('should delete a key', function () {
+              driver.put('foo', 'bar');
+              driver.delete('foo');
+
+              expect(driver.get('foo')).to.be.null;
+            });
+          });
+        });
+      })(driverName);
     }
   });
 });

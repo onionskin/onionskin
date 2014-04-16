@@ -77,6 +77,30 @@
   })();
 
   Stash.Drivers = {};
+  Stash.Drivers.Utils = {
+    validateValue: function (value) {
+      if (!JSON.stringify(value)) {
+        throw new TypeError('Only serializables values can be cached');
+      }
+    },
+    calculateExpiration: function (expiration) {
+      if (typeof(expiration) === 'number') {
+        expiration *= 1000;
+        expiration += Date.now();
+      } else if (expiration instanceof Date) {
+        expiration = expiration.getTime();
+      }
+
+      return expiration;
+    },
+    assemble: function (value, expiration) {
+      Stash.Drivers.Utils.validateValue(value);
+      expiration = Stash.Drivers.Utils.calculateExpiration(expiration);
+
+      return { value: value, expiration: expiration };
+    }
+  };
+
   Stash.Drivers.Ephemeral = (function () {
     function Ephemeral () {
       this._cache_ = {};
@@ -87,18 +111,7 @@
     };
 
     Ephemeral.prototype.put = function (key, value, expiration) {
-      if (!JSON.stringify(value)) {
-        throw new TypeError('Only serializables values can be cached');
-      }
-
-      if (typeof(expiration) === 'number') {
-        expiration *= 1000;
-        expiration += Date.now();
-      } else if (expiration instanceof Date) {
-        expiration = expiration.getTime();
-      }
-
-      this._cache_[key] = { value: value, expiration: expiration };
+      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration);
     };
 
     Ephemeral.prototype.delete = function (key) {
