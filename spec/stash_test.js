@@ -99,6 +99,23 @@ describe('Stash', function () {
         foo.set('bar', new Date(Date.now() - 100));
         expect(foo.isMiss()).to.be.true;
       });
+
+      context('Expired & Locked', function () {
+        context('SP_NONE', function () {
+          it('should be the default cache policy', function () {
+            foo.get();
+            expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+          });
+
+          it('should return true', function () {
+            foo.set('bar', 0);
+            foo.clear();
+            foo.get(Stash.Item.SP_NONE);
+            foo.lock();
+            expect(foo.isMiss()).to.be.true;
+          });
+        });
+      });
     });
 
     context('#clear', function () {
