@@ -35,6 +35,26 @@ describe('Stash', function () {
     var driver = pool.drivers[0];
     var foo = pool.getItem('foo');
 
+    context('#_calculateExpiration_', function () {
+      it('should return false for false expiration', function () {
+        expect(Stash.Item._calculateExpiration_(false)).to.be.false;
+      });
+
+      it('should return the time for Date values', function () {
+        var date = new Date();
+
+        expect(Stash.Item._calculateExpiration_(date))
+          .to.be.equal(date.getTime());
+      });
+
+      it('should increase Date.now by seconds', function () {
+        var date = Date.now() + 100 * 1000;
+
+        expect(Stash.Item._calculateExpiration_(100) - date)
+          .to.be.lt(100);
+      });
+    });
+
     context('#get', function () {
       it('should return null if no data is saved', function () {
         expect(foo.get()).to.be.null;
@@ -122,34 +142,12 @@ describe('Stash', function () {
         });
       });
 
-      context('#calculateExpiration', function () {
-        it('should return false for false expiration', function () {
-          expect(Stash.Drivers.Utils.calculateExpiration(false)).to.be.false;
-        });
-
-        it('should return the time for Date values', function () {
-          var date = new Date();
-
-          expect(Stash.Drivers.Utils.calculateExpiration(date))
-            .to.be.equal(date.getTime());
-        });
-
-        it('should increase Date.now by seconds', function () {
-          var date = Date.now() + 100 * 1000;
-
-          expect(Stash.Drivers.Utils.calculateExpiration(100) - date)
-            .to.be.lt(100);
-        });
-      });
-
       context('#assemble', function () {
         it('should return an object with value and expiration', function () {
-          var date = new Date();
-
-          expect(Stash.Drivers.Utils.assemble('foo', date))
+          expect(Stash.Drivers.Utils.assemble('foo', 0))
             .to.be.deep.equal({
               value: 'foo',
-              expiration: Stash.Drivers.Utils.calculateExpiration(date),
+              expiration: 0,
               locked: false
             });
         });

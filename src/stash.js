@@ -32,19 +32,37 @@
       return this;
     };
 
+    Item._calculateExpiration_ = function (expiration) {
+      if (typeof(expiration) === 'number') {
+        expiration *= 1000;
+        expiration += Date.now();
+      } else if (expiration instanceof Date) {
+        expiration = expiration.getTime();
+      }
+
+      return expiration;
+    };
+
+    Item.prototype._write_ = function () {
+      var that = this;
+
+      this.pool.drivers.reverse().forEach(function (driver) {
+        driver.put(that.key, that.value, that.expiration, that.locked);
+      });
+    };
+
     Item.prototype.get = function (cachePolicy) {
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       return this._load_().value;
     };
 
     Item.prototype.set = function (value, expiration) {
-      var that = this;
-
       this._loaded_ = false;
+      this.expiration = Item._calculateExpiration_(expiration);
+      this.locked = false;
+      this.value = value;
 
-      this.pool.drivers.reverse().forEach(function (driver) {
-        driver.put(that.key, value, expiration);
-      });
+      this._write_();
     };
 
     Item.prototype.isMiss = function () {
@@ -62,7 +80,7 @@
     Item.prototype.lock = function () {
       this._load_();
       this.locked = true;
-      this.set(this.value, this.expiration, true);
+      this._write_();
     };
 
     return Item;
@@ -95,19 +113,8 @@
         throw new TypeError('Only serializables values can be cached');
       }
     },
-    calculateExpiration: function (expiration) {
-      if (typeof(expiration) === 'number') {
-        expiration *= 1000;
-        expiration += Date.now();
-      } else if (expiration instanceof Date) {
-        expiration = expiration.getTime();
-      }
-
-      return expiration;
-    },
     assemble: function (value, expiration, locked) {
       Stash.Drivers.Utils.validateValue(value);
-      expiration = Stash.Drivers.Utils.calculateExpiration(expiration);
 
       return { value: value, expiration: expiration, locked: locked || false };
     }
