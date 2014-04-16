@@ -114,6 +114,14 @@ describe('Stash', function () {
             expect(foo.isMiss()).to.be.true;
           });
         });
+
+        context('SP_OLD', function () {
+          it('should return the false if cache is locked', function () {
+            foo.lock();
+            foo.get(Stash.Item.SP_OLD);
+            expect(foo.isMiss()).to.be.false;
+          });
+        });
       });
     });
 

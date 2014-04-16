@@ -68,6 +68,10 @@
     Item.prototype.isMiss = function () {
       this._load_();
 
+      if (this.locked && this.cachePolicy & Stash.Item.SP_OLD) {
+        return false;
+      }
+
       return typeof(this.expiration) === 'number' && this.expiration < Date.now();
     };
 
