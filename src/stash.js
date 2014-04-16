@@ -9,6 +9,11 @@
       this.expiration = false;
     }
 
+    Item.SP_NONE = 1;
+    Item.SP_OLD = 2;
+    Item.SP_PRECOMPUTE = 4;
+    Item.SP_VALUE = 8;
+
     Item.prototype._load_ = function () {
       if (!this._loaded_) {
         this._loaded_ = true;
@@ -27,7 +32,8 @@
       return this;
     };
 
-    Item.prototype.get = function () {
+    Item.prototype.get = function (cachePolicy) {
+      this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       return this._load_().value;
     };
 
@@ -51,6 +57,12 @@
       this._load_();
 
       this.set(this.value, -1);
+    };
+
+    Item.prototype.lock = function () {
+      this._load_();
+      this.locked = true;
+      this.set(this.value, this.expiration, true);
     };
 
     return Item;
@@ -93,11 +105,11 @@
 
       return expiration;
     },
-    assemble: function (value, expiration) {
+    assemble: function (value, expiration, locked) {
       Stash.Drivers.Utils.validateValue(value);
       expiration = Stash.Drivers.Utils.calculateExpiration(expiration);
 
-      return { value: value, expiration: expiration };
+      return { value: value, expiration: expiration, locked: locked || false };
     }
   };
 
@@ -110,8 +122,8 @@
       return this._cache_[key] || null;
     };
 
-    Ephemeral.prototype.put = function (key, value, expiration) {
-      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration);
+    Ephemeral.prototype.put = function (key, value, expiration, locked) {
+      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration, locked);
     };
 
     Ephemeral.prototype.delete = function (key) {

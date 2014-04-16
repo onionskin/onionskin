@@ -32,11 +32,17 @@ describe('Stash', function () {
 
   context('::Item', function () {
     var pool = new Stash.Pool();
+    var driver = pool.drivers[0];
     var foo = pool.getItem('foo');
 
     context('#get', function () {
       it('should return null if no data is saved', function () {
         expect(foo.get()).to.be.null;
+      });
+
+      it('should use SP_NONE as default cache policy', function () {
+        foo.get();
+        expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
       });
     });
 
@@ -44,6 +50,12 @@ describe('Stash', function () {
       it('should set a value to an item', function () {
         foo.set('bar');
         expect(foo.get()).to.be.equal('bar');
+      });
+
+      it('should unlock cache', function () {
+        foo.lock();
+        foo.set('baz');
+        expect(driver.get(foo.key).locked).to.be.false;
       });
     });
 
@@ -74,6 +86,14 @@ describe('Stash', function () {
         foo.set('bar', 1000);
         foo.clear();
         expect(foo.isMiss()).to.be.true;
+      });
+    });
+
+    context('#lock', function () {
+      it('should set cache as locked', function () {
+        foo.lock();
+        expect(foo.pool.drivers[0].get(foo.key).locked)
+          .to.be.false;
       });
     });
   });
@@ -129,7 +149,8 @@ describe('Stash', function () {
           expect(Stash.Drivers.Utils.assemble('foo', date))
             .to.be.deep.equal({
               value: 'foo',
-              expiration: Stash.Drivers.Utils.calculateExpiration(date)
+              expiration: Stash.Drivers.Utils.calculateExpiration(date),
+              locked: false
             });
         });
       });
@@ -162,7 +183,13 @@ describe('Stash', function () {
           context('#put', function () {
             it('should store a value', function () {
               driver.put('foo', 'bar');
-              expect(driver.get('foo')).to.be.deep.equal({value: 'bar', expiration: undefined });
+
+
+              expect(driver.get('foo')).to.be.deep.equal({
+                value: 'bar',
+                expiration: undefined,
+                locked: false
+              });
             });
 
             it('should throw if value is not serializable', function () {
