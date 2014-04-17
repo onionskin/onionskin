@@ -151,7 +151,7 @@ describe('Stash', function () {
       it('should immediately invalidate a key', function () {
         foo.set('bar', 1000);
         foo.clear();
-        expect(foo.isMiss()).to.be.true;
+        expect(foo.get()).to.be.null;
       });
     });
 

@@ -27,6 +27,10 @@
           this.value = value.value;
           this.expiration = value.expiration;
           this.locked = value.locked;
+        } else {
+          this.value = null;
+          this.expiration = false;
+          this.locked = false;
         }
       }
 
@@ -87,10 +91,12 @@
     };
 
     Item.prototype.clear = function () {
-      this._load_();
-      this.expiration = -1;
-      this.locked = false;
-      this._write_();
+      var that = this;
+
+      this._loaded_ = false;
+      this.pool.drivers.forEach(function (driver) {
+        driver.delete(that.key);
+      });
     };
 
     Item.prototype.lock = function () {
@@ -178,7 +184,6 @@
       var key = key.split('/');
       var last = key.pop();
       var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
-      console.log(key, last, this._cache_, cache);
 
       cache[last] = null;
     };
