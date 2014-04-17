@@ -19,7 +19,7 @@
       this.value = null;
       this.expiration = false;
       this.locked = false;
-    }
+    };
 
     Item.prototype._load_ = function () {
       if (!this._loaded_) {
@@ -63,7 +63,7 @@
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
-      if (cachePolicy & Stash.Item.SP_VALUE && this.locked) {
+      if ((cachePolicy & Stash.Item.SP_VALUE) && this.locked) {
         return policyData;
       }
 
@@ -83,10 +83,10 @@
     Item.prototype.isMiss = function () {
       this._load_();
 
-      if (this.locked && this.cachePolicy & Stash.Item.SP_OLD) {
+      if (this.locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
         return false;
       } else if (!this.locked &&
-                 this.cachePolicy & Stash.Item.SP_PRECOMPUTE &&
+                 (this.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
                  this.policyData * 1000 >= this.expiration - Date.now()) {
         return true;
       }
@@ -125,7 +125,7 @@
     }
 
     Pool.prototype.getItem = function (key) {
-      item = new Stash.Item(key, this);
+      var item = new Stash.Item(key, this);
 
       return item;
     };
@@ -186,7 +186,7 @@
     };
 
     Ephemeral.prototype.delete = function (key) {
-      var key = key.split('/');
+      key = key.split('/');
       var last = key.pop();
       var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
 
@@ -195,7 +195,7 @@
 
     Ephemeral.prototype.flush = function () {
       this._cache_ = {};
-    }
+    };
 
     Ephemeral.prototype.parent = Ephemeral.prototype;
 
@@ -228,12 +228,12 @@
       }
     };
 
-    LocalStorage.prototype.put = function (key, value, expiration, locked) {
+    LocalStorage.prototype.put = function () {
       this.parent.put.apply(this, arguments);
       this._commit_();
     };
 
-    LocalStorage.prototype.delete = function (key) {
+    LocalStorage.prototype.delete = function () {
       this.parent.delete.apply(this, arguments);
       this._commit_();
     };
