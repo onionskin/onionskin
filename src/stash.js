@@ -5,14 +5,21 @@
     function Item(key, pool) {
       this.key = key;
       this.pool = pool;
-      this.value = null;
-      this.expiration = false;
+
+      this._unload_();
     }
 
     Item.SP_NONE = 1;
     Item.SP_OLD = 2;
     Item.SP_PRECOMPUTE = 4;
     Item.SP_VALUE = 8;
+
+    Item.prototype._unload_ = function () {
+      this._loaded_ = false;
+      this.value = null;
+      this.expiration = false;
+      this.locked = false;
+    }
 
     Item.prototype._load_ = function () {
       if (!this._loaded_) {
@@ -27,10 +34,6 @@
           this.value = value.value;
           this.expiration = value.expiration;
           this.locked = value.locked;
-        } else {
-          this.value = null;
-          this.expiration = false;
-          this.locked = false;
         }
       }
 
@@ -68,7 +71,8 @@
     };
 
     Item.prototype.set = function (value, expiration) {
-      this._loaded_ = false;
+      this._unload_();
+
       this.expiration = Item._calculateExpiration_(expiration);
       this.locked = false;
       this.value = value;
@@ -93,7 +97,8 @@
     Item.prototype.clear = function () {
       var that = this;
 
-      this._loaded_ = false;
+      this._unload_():
+
       this.pool.drivers.forEach(function (driver) {
         driver.delete(that.key);
       });
