@@ -122,6 +122,20 @@ describe('Stash', function () {
             expect(foo.isMiss()).to.be.false;
           });
         });
+
+        context('SP_PRECOMPUTE', function () {
+          it('should return true before expiration for a single instance', function () {
+            foo.set('bar', 100);
+            foo.get(Stash.Item.SP_PRECOMPUTE, 101);
+
+            expect(foo.isMiss()).to.be.true;
+            foo.lock();
+
+            var bar = pool.getItem(foo.key);
+            bar.get(Stash.Item.SP_PRECOMPUTE, 101);
+            expect(bar.isMiss()).to.be.false;
+          });
+        });
       });
     });
 

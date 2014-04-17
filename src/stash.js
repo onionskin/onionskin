@@ -26,6 +26,7 @@
         if (value) {
           this.value = value.value;
           this.expiration = value.expiration;
+          this.locked = value.locked;
         }
       }
 
@@ -51,8 +52,10 @@
       });
     };
 
-    Item.prototype.get = function (cachePolicy) {
+    Item.prototype.get = function (cachePolicy, policyData) {
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
+      this.policyData = policyData;
+
       return this._load_().value;
     };
 
@@ -70,6 +73,10 @@
 
       if (this.locked && this.cachePolicy & Stash.Item.SP_OLD) {
         return false;
+      } else if (!this.locked &&
+                 this.cachePolicy & Stash.Item.SP_PRECOMPUTE &&
+                 this.policyData * 1000 >= this.expiration - Date.now()) {
+        return true;
       }
 
       return typeof(this.expiration) === 'number' && this.expiration < Date.now();
