@@ -88,8 +88,9 @@
 
     Item.prototype.clear = function () {
       this._load_();
-
-      this.set(this.value, -1);
+      this.expiration = -1;
+      this.locked = false;
+      this._write_();
     };
 
     Item.prototype.lock = function () {
