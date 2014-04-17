@@ -187,6 +187,8 @@
       this._cache_ = {};
     }
 
+    Ephemeral.prototype.parent = Ephemeral.prototype;
+
     return Ephemeral;
   })();
 
@@ -195,6 +197,8 @@
       this.namespace = namespace || 'stash';
       this._loadCache_();
     }
+
+    LocalStorage.prototype = new Stash.Drivers.Ephemeral();
 
     LocalStorage.prototype._loadCache_ = function () {
       var saved = localStorage.getItem(this.namespace);
@@ -206,29 +210,18 @@
       localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
     };
 
-    LocalStorage.prototype.get = function (key) {
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
-
-      return cache.__stash_value__ || null;
-    };
-
     LocalStorage.prototype.put = function (key, value, expiration, locked) {
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
-
-      cache.__stash_value__ = Stash.Drivers.Utils.assemble(value, expiration, locked);
+      this.parent.put.apply(this, arguments);
       this._commit_();
     };
 
     LocalStorage.prototype.delete = function (key) {
-      var key = key.split('/');
-      var last = key.pop();
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
-
-      cache[last] = null;
+      this.parent.delete.apply(this, arguments);
+      this._commit_();
     };
 
     LocalStorage.prototype.flush = function () {
-      this._cache_ = {};
+      this.parent.flush.apply(this, arguments);
       this._commit_();
     };
 

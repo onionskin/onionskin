@@ -218,6 +218,10 @@ describe('Stash', function () {
             expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);
           });
 
+          it('should be an instance of Ephemeral', function() {
+            expect(driver).to.be.an.instanceof(Stash.Drivers.Ephemeral);
+          });
+
           context('#get', function () {
             it('should return null for nonexisting keys', function () {
               expect(driver.get('foo')).to.be.null;
