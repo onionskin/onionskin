@@ -63,7 +63,7 @@ There are 4 cache policies right now:
 ## TODO ##
 
 * Add more drivers
-* Suporte Node.js as well
+* ~~Suporte Node.js as well~~ Add Node.js exclusive drivers
 * Maybe a jQuery plugin to integrate with ajax calls
 
 ## Contact ##
