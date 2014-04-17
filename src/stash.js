@@ -97,7 +97,7 @@
     Item.prototype.clear = function () {
       var that = this;
 
-      this._unload_():
+      this._unload_();
 
       this.pool.drivers.forEach(function (driver) {
         driver.delete(that.key);
