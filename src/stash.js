@@ -119,6 +119,12 @@
       return item;
     };
 
+    Pool.prototype.flush = function () {
+      this.drivers.forEach(function (driver) {
+        driver.flush();
+      });
+    };
+
     return Pool;
   })();
 
