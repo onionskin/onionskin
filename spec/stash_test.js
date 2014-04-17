@@ -222,6 +222,11 @@ describe('Stash', function () {
             it('should return null for nonexisting keys', function () {
               expect(driver.get('foo')).to.be.null;
             });
+
+            it('should accept path like cache', function () {
+              driver.put('a/b/c', 'foo');
+              expect(driver.get('a/b/c').value).to.be.equal('foo');
+            });
           });
 
           context('#put', function () {
@@ -247,8 +252,13 @@ describe('Stash', function () {
             it('should delete a key', function () {
               driver.put('foo', 'bar');
               driver.delete('foo');
-
               expect(driver.get('foo')).to.be.null;
+            });
+
+            it('should delete all subkeys', function () {
+              driver.put('foo/bar/baz', 'baz');
+              driver.delete('foo/bar');
+              expect(driver.get('foo/bar/baz')).to.be.null;
             });
           });
         });
@@ -260,6 +270,7 @@ describe('Stash', function () {
       var cacheManager = new Stash.Drivers.LocalStorage(namespace);
       var pool = new Stash.Pool(cacheManager);
       var item = pool.getItem('foo');
+      pool.flush();
 
       it('should commit to localStorage', function () {
         item.set('bar');

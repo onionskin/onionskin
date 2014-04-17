@@ -139,6 +139,20 @@
       Stash.Drivers.Utils.validateValue(value);
 
       return { value: value, expiration: expiration, locked: locked || false };
+    },
+    cd: function (cache, key) {
+      if (!key) {
+        return cache;
+      }
+
+      return key.split('/').reduce(function (cache, folder) {
+        if (!cache[folder]) {
+          cache[folder] = { __stash_value__: null };
+        }
+
+        cache = cache[folder];
+        return cache;
+      }, cache);
     }
   };
 
@@ -148,15 +162,25 @@
     }
 
     Ephemeral.prototype.get = function (key) {
-      return this._cache_[key] || null;
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
+
+      return cache.__stash_value__ || null;
     };
 
     Ephemeral.prototype.put = function (key, value, expiration, locked) {
-      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration, locked);
+
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
+
+      cache.__stash_value__ = Stash.Drivers.Utils.assemble(value, expiration, locked);
     };
 
     Ephemeral.prototype.delete = function (key) {
-      this._cache_[key] = null;
+      var key = key.split('/');
+      var last = key.pop();
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
+      console.log(key, last, this._cache_, cache);
+
+      cache[last] = null;
     };
 
     Ephemeral.prototype.flush = function () {
@@ -183,16 +207,24 @@
     };
 
     LocalStorage.prototype.get = function (key) {
-      return this._cache_[key] || null;
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
+
+      return cache.__stash_value__ || null;
     };
 
-    LocalStorage.prototype.put = function (key, value, expiration) {
-      this._cache_[key] = Stash.Drivers.Utils.assemble(value, expiration);
+    LocalStorage.prototype.put = function (key, value, expiration, locked) {
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
+
+      cache.__stash_value__ = Stash.Drivers.Utils.assemble(value, expiration, locked);
       this._commit_();
     };
 
     LocalStorage.prototype.delete = function (key) {
-      this._cache_[key] = null;
+      var key = key.split('/');
+      var last = key.pop();
+      var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
+
+      cache[last] = null;
     };
 
     LocalStorage.prototype.flush = function () {
