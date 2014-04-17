@@ -4,7 +4,13 @@ Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it e
 
 ## Usage ##
 
-By now, you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/tadeuzagallo/stash.js/master/src/stash.js) and append it to you html
+You can install it via [bower](http://bower.io/)
+
+```
+$ bower install stash
+```
+
+Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/tadeuzagallo/stash.js/master/src/stash.js) file
 
 ### Basic Usage ###
 
