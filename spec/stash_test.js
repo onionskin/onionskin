@@ -81,10 +81,8 @@ describe('Stash', function () {
 
     context('#isMiss', function () {
       it('should return true if cache is expired', function () {
-        foo.set('bar', 0);
-        setTimeout(function () {
-          expect(foo.isMiss()).to.be.true;
-        }, 1)
+        foo.set('bar', -1);
+        expect(foo.isMiss()).to.be.true;
       });
 
       it('should return false when it is still valid', function () {
