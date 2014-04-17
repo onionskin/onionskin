@@ -4,8 +4,9 @@
   "authors": [
     "Tadeu Zagallo <tadeuzagallo@gmail.com>"
   ],
-  "description": "Cache manager library for javascript",
+  "description": "Multilayer Cache Manager for JavaScript",
   "keywords": [
+    "stash",
     "cache",
     "manager",
     "library",
@@ -16,9 +17,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "app/bower_components",
-    "test",
-    "tests"
+    "spec"
   ],
   "devDependencies": {
     "mocha": "~1.18.2",
