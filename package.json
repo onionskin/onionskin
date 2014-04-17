@@ -4,7 +4,7 @@
   "description": "Multilayer Cache Manager for JavaScript",
   "main": "src/stash.js",
   "scripts": {
-    "test": "mocha spec"
+    "test": "istanbul cover _mocha -- spec/*.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "~1.9.1",
+    "istanbul": "^0.2.7",
     "mocha": "~1.18.2"
   }
 }
