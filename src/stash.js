@@ -56,6 +56,10 @@
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
+      if (cachePolicy & Stash.Item.SP_VALUE && this.locked) {
+        return policyData;
+      }
+
       return this._load_().value;
     };
 

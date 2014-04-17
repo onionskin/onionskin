@@ -136,6 +136,14 @@ describe('Stash', function () {
             expect(bar.isMiss()).to.be.false;
           });
         });
+
+        context('SP_VALUE', function () {
+          it('should return the specified value when locked', function () {
+            foo.set('bar');
+            foo.lock();
+            expect(foo.get(Stash.Item.SP_VALUE, 'baz')).to.be.equal('baz');
+          });
+        });
       });
     });
 
