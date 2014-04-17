@@ -1,6 +1,11 @@
+if (typeof(require) !== 'undefined') {
+  var Stash = require('../src/stash').Stash;
+  var expect = require('chai').expect;
+}
+
 describe('Stash', function () {
   it('should be available on window', function () {
-    expect(window.Stash).not.to.be.undefined;
+    expect(Stash).not.to.be.undefined;
   });
 
   context('::Pool', function () {
@@ -263,27 +268,30 @@ describe('Stash', function () {
       })(driverName);
     }
 
-    context('::LocalStorage Exclusive', function () {
-      var namespace = 'test';
-      var cacheManager = new Stash.Drivers.LocalStorage(namespace);
-      var pool = new Stash.Pool(cacheManager);
-      var item = pool.getItem('foo');
-      pool.flush();
+    if (typeof(localStorage) !== 'undefined') {
+      context('::LocalStorage Exclusive', function () {
+        var namespace = 'test';
+        var cacheManager = new Stash.Drivers.LocalStorage(namespace);
+        var pool = new Stash.Pool(cacheManager);
+        var item = pool.getItem('foo');
+        pool.flush();
 
-      it('should commit to localStorage', function () {
-        item.set('bar');
-        
-        expect(localStorage.getItem(namespace))
-          .to.contain('bar');
+        it('should commit to localStorage', function () {
+          item.set('bar');
+          
+          expect(localStorage.getItem(namespace))
+            .to.contain('bar');
+        });
+
+        it('should share cache between instances', function () {
+          var content = 'foo bar baz';
+          item.set(content);
+
+          expect(new Stash.Drivers.LocalStorage(namespace).get(item.key).value)
+            .to.be.equal(content);
+        });
       });
+    }
 
-      it('should share cache between instances', function () {
-        var content = 'foo bar baz';
-        item.set(content);
-
-        expect(new Stash.Drivers.LocalStorage(namespace).get(item.key).value)
-          .to.be.equal(content);
-      });
-    });
   });
 });

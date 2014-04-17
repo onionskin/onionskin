@@ -211,13 +211,21 @@
     LocalStorage.prototype = new Stash.Drivers.Ephemeral();
 
     LocalStorage.prototype._loadCache_ = function () {
-      var saved = localStorage.getItem(this.namespace);
+      this._cache_ = {};
 
-      this._cache_ = !!saved ? JSON.parse(saved) : {};
+      if (typeof(localStorage) !== 'undefined') {
+        var saved = localStorage.getItem(this.namespace);
+
+        if (saved) {
+          this._cache_ = JSON.parse(saved);
+        }
+      }
     };
 
     LocalStorage.prototype._commit_ = function () {
-      localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
+      if (typeof(localStorage) !== 'undefined') {
+        localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
+      }
     };
 
     LocalStorage.prototype.put = function (key, value, expiration, locked) {
@@ -239,4 +247,4 @@
   })();
 
   exports.Stash = Stash;
-})(window);
+})(typeof(window) === 'undefined' ? module.exports : window);

@@ -1,0 +1,28 @@
+{
+  "name": "Stash.js",
+  "version": "0.0.1",
+  "description": "Multilayer Cache Manager for JavaScript",
+  "main": "src/stash.js",
+  "scripts": {
+    "test": "mocha spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tadeuzagallo/stash.js.git"
+  },
+  "keywords": [
+    "stash",
+    "cache",
+    "manager",
+    "multilayer"
+  ],
+  "author": "Tadeu Zagallo <tadeuzagallo@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tadeuzagallo/stash.js/issues"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.18.2"
+  }
+}
