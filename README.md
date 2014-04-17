@@ -1,10 +1,16 @@
 # Stash.js [![Build Status](https://travis-ci.org/tadeuzagallo/stash.js.svg?branch=master)](https://travis-ci.org/tadeuzagallo/stash.js) #
 
-Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it easier to save your data on multiple layers of cache.
+Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it easier to save your data on multiple layers of cache
 
 ## Usage ##
 
-You can install it via [bower](http://bower.io/)
+You can either install via [npm](https://www.npmjs.org)
+
+```javascript
+$ npm install stash.js
+```
+
+Or via [bower](http://bower.io/)
 
 ```
 $ bower install stash
