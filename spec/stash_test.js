@@ -214,10 +214,6 @@ describe('Stash', function () {
           var driver = new Stash.Drivers[driverName]();
           driver.flush();
 
-          it('should be a constructor', function () {
-            expect(new Stash.Drivers[driverName]()).to.be.an.instanceof(Stash.Drivers[driverName]);
-          });
-
           it('should be an instance of Ephemeral', function() {
             expect(driver).to.be.an.instanceof(Stash.Drivers.Ephemeral);
           });
