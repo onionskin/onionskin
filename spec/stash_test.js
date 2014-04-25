@@ -69,6 +69,14 @@ describe('Stash', function () {
         foo.get();
         expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
       });
+
+      it('should call callback with data', function (done) {
+        foo.set('bar');
+        foo.get(function (data) {
+          expect(data).to.be.equal('bar');
+          done();
+        });
+      });
     });
 
     context('#set', function () {
@@ -81,6 +89,12 @@ describe('Stash', function () {
         foo.lock();
         foo.set('baz');
         expect(driver.get(foo.key).locked).to.be.false;
+      });
+
+      it('should call the callback', function (done) {
+        foo.set('baz', function (err) {
+          done();
+        });
       });
     });
 

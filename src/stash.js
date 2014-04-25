@@ -15,29 +15,38 @@
     Item.SP_VALUE = 8;
 
     Item.prototype._unload_ = function () {
-      this._loaded_ = false;
       this.value = null;
       this.expiration = false;
       this.locked = false;
     };
 
-    Item.prototype._load_ = function () {
-      if (!this._loaded_) {
-        this._loaded_ = true;
-        var that = this;
+    Item.prototype._load_ = function (callback) {
+      var that = this;
 
-        var value = this.pool.drivers.reduce(function (a, b) {
-          return a || b.get(that.key);
-        }, false);
-
-        if (value) {
-          this.value = value.value;
-          this.expiration = value.expiration;
-          this.locked = value.locked;
-        }
-      }
+      var value = this.pool.drivers.reduce(function (a, b) {
+        return a || b.get(that.key, function (data) {
+          if (that && data) {
+            that.value = data.value;
+            that.expiration = data.expiration;
+            that.locked = data.locked;
+            callback && callback(that);
+            that = false;
+          }
+        });
+      }, false);
 
       return this;
+    };
+
+    Item.prototype._write_ = function (callback) {
+      var that = this;
+
+      this.pool.drivers.reverse().forEach(function (driver) {
+        driver.put(that.key, that.value, that.expiration, that.locked, function (err) {
+          callback && callback(err);
+          callback = null;
+        });
+      });
     };
 
     Item._calculateExpiration_ = function (expiration) {
@@ -51,15 +60,17 @@
       return expiration;
     };
 
-    Item.prototype._write_ = function () {
-      var that = this;
+    Item.prototype.get = function (cachePolicy, policyData, callback) {
+      if (typeof cachePolicy === 'function') {
+        callback = cachePolicy;
+        cachePolicy = false;
+      }
 
-      this.pool.drivers.reverse().forEach(function (driver) {
-        driver.put(that.key, that.value, that.expiration, that.locked);
-      });
-    };
+      if (typeof policyData === 'function') {
+        callback = cachePolicy;
+        policyData = null;
+      }
 
-    Item.prototype.get = function (cachePolicy, policyData) {
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
@@ -67,22 +78,27 @@
         return policyData;
       }
 
-      return this._load_().value;
+      return this._load_(function (item) {
+        callback && callback(item.value);
+      }).value;
     };
 
-    Item.prototype.set = function (value, expiration) {
+    Item.prototype.set = function (value, expiration, callback) {
+      if (typeof expiration === 'function') {
+        callback = expiration;
+        expiration = null;
+      }
+
       this._unload_();
 
       this.expiration = Item._calculateExpiration_(expiration);
       this.locked = false;
       this.value = value;
 
-      this._write_();
+      this._write_(callback);
     };
 
     Item.prototype.isMiss = function () {
-      this._load_();
-
       if (this.locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
         return false;
       } else if (!this.locked &&
@@ -105,7 +121,6 @@
     };
 
     Item.prototype.lock = function () {
-      this._load_();
       this.locked = true;
       this._write_();
     };
