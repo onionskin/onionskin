@@ -230,6 +230,14 @@ describe('Stash', function () {
               driver.put('a/b/c', 'foo');
               expect(driver.get('a/b/c').value).to.be.equal('foo');
             });
+
+            it('should accept callback', function (done) {
+              driver.put('foo', 'bar');
+              driver.get('foo', function (data) {
+                expect(data.value).to.be.equal('bar');
+                done();
+              });
+            });
           });
 
           context('#put', function () {
@@ -248,6 +256,12 @@ describe('Stash', function () {
               expect(function () {
                 driver.put('foo', function () {});
               }).to.throw(TypeError);
+            });
+
+            it('should call callback', function (done) {
+              driver.put('foo', 'bar', function (err) {
+                done();
+              });
             });
           });
 

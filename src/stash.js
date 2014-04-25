@@ -172,17 +172,34 @@
       this._cache_ = {};
     }
 
-    Ephemeral.prototype.get = function (key) {
+    Ephemeral.prototype.get = function (key, callback) {
       var cache = Stash.Drivers.Utils.cd(this._cache_, key);
 
-      return cache.__stash_value__ || null;
+      var value = cache.__stash_value__ || null;
+
+      if (typeof callback === 'function') {
+        callback(value);
+      }
+
+      return value;
     };
 
-    Ephemeral.prototype.put = function (key, value, expiration, locked) {
+    Ephemeral.prototype.put = function (key, value, expiration, locked, callback) {
+      if (typeof expiration === 'function') {
+        callback = expiration;
+        expiration = null;
+      }
+
+      if (typeof locked === 'function') {
+        callback = locaked;
+        locked = null;
+      }
 
       var cache = Stash.Drivers.Utils.cd(this._cache_, key);
 
       cache.__stash_value__ = Stash.Drivers.Utils.assemble(value, expiration, locked);
+
+      callback && callback(null);
     };
 
     Ephemeral.prototype.delete = function (key) {
@@ -222,15 +239,18 @@
       }
     };
 
-    LocalStorage.prototype._commit_ = function () {
+    LocalStorage.prototype._commit_ = function (callback) {
       if (typeof(localStorage) !== 'undefined') {
         localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
+        callback && callback(null);
       }
+
+      callback && callback({ message: 'LocalStorage is not available'});
     };
 
-    LocalStorage.prototype.put = function () {
-      this.parent.put.apply(this, arguments);
-      this._commit_();
+    LocalStorage.prototype.put = function (key, value, expiration, locked, callback) {
+      this.parent.put.call(this, key, value, expiration, locked);
+      this._commit_(callback);
     };
 
     LocalStorage.prototype.delete = function () {
