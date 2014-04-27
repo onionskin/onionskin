@@ -4,7 +4,7 @@ describe('Stash::Drivers', function () {
   });
 
   for (var driverName in Stash.Drivers) {
-    if (driverName !== 'LocalStorage') {
+    if (driverName === 'Utils') {
       continue;
     }
 

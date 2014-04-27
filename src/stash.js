@@ -178,7 +178,7 @@
     var cache = {};
     function Ephemeral () {}
 
-    Ephemeral.prototype.get = function (key, callback) {
+    Ephemeral.prototype.get = function (key) {
       key = Stash.Drivers.Utils.key('', key);
       var data = cache[key] || null;
 
@@ -186,17 +186,17 @@
         data = JSON.parse(data);
       }
 
-      callback(data);
+      return Q(data);
     };
 
-    Ephemeral.prototype.put = function (key, value, expiration, callback) {
+    Ephemeral.prototype.put = function (key, value, expiration) {
       key = Stash.Drivers.Utils.key('', key);
       var data = Stash.Drivers.Utils.assemble(value, expiration);
       cache[key] = data;
-      callback && callback();
+      return Q();
     };
 
-    Ephemeral.prototype.delete = function (key, callback) {
+    Ephemeral.prototype.delete = function (key) {
       key = Stash.Drivers.Utils.key('', key);
       var length = key.length;
 
@@ -207,7 +207,7 @@
       });
 
       cache[key] = null;
-      callback && callback();
+      return Q();
     };
 
     Ephemeral.prototype.flush = function () {
@@ -218,6 +218,7 @@
     Ephemeral.prototype.lock = function (key) {
       var key = Stash.Drivers.Utils.key('', key) + '_lock';
       cache[key] = 1;
+      return Q();
     };
 
     return Ephemeral;
