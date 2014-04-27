@@ -1,5 +1,10 @@
 (function (exports) {
   var Stash = exports.Stash || {};
+  var isNode = typeof require !== 'undefined';
+
+  if (isNode) {
+    var _ = require('lodash');
+  }
 
   Stash.Item = (function () {
     function Item(key, pool) {
@@ -156,29 +161,24 @@
 
   Stash.Drivers = {};
   Stash.Drivers.Utils = {
-    validateValue: function (value) {
-      if (!JSON.stringify(value)) {
+    assemble: function (value, expiration) {
+      if (typeof value === 'function') {
         throw new TypeError('Only serializables values can be cached');
       }
-    },
-    assemble: function (value, expiration, locked) {
-      Stash.Drivers.Utils.validateValue(value);
 
-      return { value: value, expiration: expiration, locked: locked || false };
+      return JSON.stringify({ value: value, expiration: expiration });
     },
-    cd: function (cache, key) {
-      if (!key) {
-        return cache;
+    key: function (namespace, key) {
+      if (key instanceof Array) {
+        key.unshift(namespace);
+        return key.filter(String).join('/');
+      } else {
+       key = key.toString()
+        .trim()
+        .replace(/^\/+/g, '')
+        .replace(/\/+$/g, '');
+       return namespace + '/' + key;
       }
-
-      return key.split('/').reduce(function (cache, folder) {
-        if (!cache[folder]) {
-          cache[folder] = { __stash_value__: null };
-        }
-
-        cache = cache[folder];
-        return cache;
-      }, cache);
     }
   };
 
@@ -237,45 +237,49 @@
   Stash.Drivers.LocalStorage = (function () {
     function LocalStorage (namespace) {
       this.namespace = namespace || 'stash';
-      this._loadCache_();
     }
 
-    LocalStorage.prototype = new Stash.Drivers.Ephemeral();
+    LocalStorage.prototype.get = function (key, callback) {
+      key = Stash.Drivers.Utils.key(this.namespace, key);
+      var data = localStorage.getItem(key);
+      
+      if (data) {
+        data = JSON.parse(data);
+      }
 
-    LocalStorage.prototype._loadCache_ = function () {
-      this._cache_ = {};
+      callback(data);
+    }
 
-      if (typeof(localStorage) !== 'undefined') {
-        var saved = localStorage.getItem(this.namespace);
+    LocalStorage.prototype.put = function (key, value, expiration, callback) {
+      key = Stash.Drivers.Utils.key(this.namespace, key);
+      var data = Stash.Drivers.Utils.assemble(value, expiration);
 
-        if (saved) {
-          this._cache_ = JSON.parse(saved);
+      this.putRaw(key, data, callback);
+    };
+
+    LocalStorage.prototype.putRaw = function (key, value, callback) {
+      localStorage.setItem(key, value);
+      callback && callback();
+    }
+
+    LocalStorage.prototype.delete = function (key, callback) {
+      key = Stash.Drivers.Utils.key(this.namespace, key);
+      var length = key.length;
+
+      for (var i = 0, l = localStorage.length; i < l; i++) {
+        var _key = localStorage.key(i);
+        if (_key && _key.substr(0, length) === key) {
+          localStorage.removeItem(_key);
         }
       }
+
+      localStorage.removeItem(key);
+
+      callback && callback();
     };
 
-    LocalStorage.prototype._commit_ = function (callback) {
-      if (typeof(localStorage) !== 'undefined') {
-        localStorage.setItem(this.namespace, JSON.stringify(this._cache_));
-        callback && callback(null);
-      }
-
-      callback && callback({ message: 'LocalStorage is not available'});
-    };
-
-    LocalStorage.prototype.put = function (key, value, expiration, locked, callback) {
-      this.parent.put.call(this, key, value, expiration, locked);
-      this._commit_(callback);
-    };
-
-    LocalStorage.prototype.delete = function () {
-      this.parent.delete.apply(this, arguments);
-      this._commit_();
-    };
-
-    LocalStorage.prototype.flush = function () {
-      this.parent.flush.apply(this, arguments);
-      this._commit_();
+    LocalStorage.prototype.flush = function (callback) {
+      this.delete('', callback);
     };
 
     return LocalStorage;
