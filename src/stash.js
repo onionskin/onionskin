@@ -3,7 +3,7 @@
   var isNode = typeof require !== 'undefined';
 
   if (isNode) {
-    var _ = require('lodash');
+    Q = require('q');
   }
 
   Stash.Item = (function () {
@@ -22,7 +22,6 @@
     Item.prototype._unload_ = function () {
       this.value = null;
       this.expiration = false;
-      this.locked = false;
     };
 
     Item.prototype._load_ = function (callback) {
@@ -47,7 +46,7 @@
       var that = this;
 
       this.pool.drivers.reverse().forEach(function (driver) {
-        driver.put(that.key, that.value, that.expiration, that.locked, function (err) {
+        driver.put(that.key, that.value, that.expiration, function (err) {
           callback && callback(err);
           callback = null;
         });
@@ -65,17 +64,7 @@
       return expiration;
     };
 
-    Item.prototype.get = function (cachePolicy, policyData, callback) {
-      if (typeof cachePolicy === 'function') {
-        callback = cachePolicy;
-        cachePolicy = false;
-      }
-
-      if (typeof policyData === 'function') {
-        callback = cachePolicy;
-        policyData = null;
-      }
-
+    Item.prototype.get = function (cachePolicy, policyData) {
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
@@ -97,22 +86,24 @@
       this._unload_();
 
       this.expiration = Item._calculateExpiration_(expiration);
-      this.locked = false;
       this.value = value;
 
       this._write_(callback);
     };
 
-    Item.prototype.isMiss = function () {
-      if (this.locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
-        return false;
-      } else if (!this.locked &&
-                 (this.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
-                 this.policyData * 1000 >= this.expiration - Date.now()) {
-        return true;
-      }
+    Item.prototype.isMiss = function (callback) {
+      this.isLocked(function (locked) {
+        if (locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
+          return false;
+        } else if (!locked &&
+                   (this.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
+                   this.policyData * 1000 >= this.expiration - Date.now()) {
+          return true;
+        }
 
-      return typeof(this.expiration) === 'number' && this.expiration < Date.now();
+        var miss = typeof(this.expiration) === 'number' && this.expiration < Date.now();
+        callback(miss);
+      }.bind(this));
     };
 
     Item.prototype.clear = function () {
@@ -126,8 +117,9 @@
     };
 
     Item.prototype.lock = function () {
-      this.locked = true;
-      this._write_();
+      this.pool.drivers.forEach(function (driver) {
+        driver.lock(this.key)
+      }.bind(this));
     };
 
     return Item;
@@ -218,9 +210,14 @@
       callback && callback();
     };
 
-    Ephemeral.prototype.flush = function (callback) {
+    Ephemeral.prototype.flush = function () {
       cache = {};
-      callback && callback();
+      return Q();
+    };
+
+    Ephemeral.prototype.lock = function (key) {
+      var key = Stash.Drivers.Utils.key('', key) + '_lock';
+      cache[key] = 1;
     };
 
     return Ephemeral;
@@ -231,7 +228,7 @@
       this.namespace = namespace || 'stash';
     }
 
-    LocalStorage.prototype.get = function (key, callback) {
+    LocalStorage.prototype.get = function (key) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
       var data = localStorage.getItem(key);
       
@@ -239,22 +236,22 @@
         data = JSON.parse(data);
       }
 
-      callback(data);
+      return Q(data);
     }
 
-    LocalStorage.prototype.put = function (key, value, expiration, callback) {
+    LocalStorage.prototype.put = function (key, value, expiration) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
       var data = Stash.Drivers.Utils.assemble(value, expiration);
 
-      this.putRaw(key, data, callback);
+      return this.putRaw(key, data);
     };
 
-    LocalStorage.prototype.putRaw = function (key, value, callback) {
+    LocalStorage.prototype.putRaw = function (key, value) {
       localStorage.setItem(key, value);
-      callback && callback();
+      return Q();
     }
 
-    LocalStorage.prototype.delete = function (key, callback) {
+    LocalStorage.prototype.delete = function (key) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
       var length = key.length;
 
@@ -266,12 +263,11 @@
       }
 
       localStorage.removeItem(key);
-
-      callback && callback();
+      return Q();
     };
 
-    LocalStorage.prototype.flush = function (callback) {
-      this.delete('', callback);
+    LocalStorage.prototype.flush = function () {
+      return this.delete('');
     };
 
     return LocalStorage;

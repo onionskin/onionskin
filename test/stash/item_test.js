@@ -24,8 +24,11 @@ describe('Stash::Item', function () {
   });
 
   context('#get', function () {
-    it('should return null if no data is saved', function () {
-      expect(foo.get()).to.be.null;
+    it('should return null if no data is saved', function (done) {
+      foo.get(function (data) {
+        expect(data).to.be.null;
+        done();
+      })
     });
 
     it('should use SP_NONE as default cache policy', function () {
@@ -48,7 +51,7 @@ describe('Stash::Item', function () {
       expect(foo.get()).to.be.equal('bar');
     });
 
-    it('should unlock cache', function () {
+    it('should unlock cache', function (done) {
       foo.lock();
       foo.set('baz');
       expect(driver.get(foo.key).locked).to.be.false;
