@@ -183,53 +183,45 @@
   };
 
   Stash.Drivers.Ephemeral = (function () {
-    function Ephemeral () {
-      this._cache_ = {};
-    }
+    var cache = {};
+    function Ephemeral () {}
 
     Ephemeral.prototype.get = function (key, callback) {
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
+      key = Stash.Drivers.Utils.key('', key);
+      var data = cache[key] || null;
 
-      var value = cache.__stash_value__ || null;
-
-      if (typeof callback === 'function') {
-        callback(value);
+      if (data) {
+        data = JSON.parse(data);
       }
 
-      return value;
+      callback(data);
     };
 
-    Ephemeral.prototype.put = function (key, value, expiration, locked, callback) {
-      if (typeof expiration === 'function') {
-        callback = expiration;
-        expiration = null;
-      }
-
-      if (typeof locked === 'function') {
-        callback = locaked;
-        locked = null;
-      }
-
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key);
-
-      cache.__stash_value__ = Stash.Drivers.Utils.assemble(value, expiration, locked);
-
-      callback && callback(null);
+    Ephemeral.prototype.put = function (key, value, expiration, callback) {
+      key = Stash.Drivers.Utils.key('', key);
+      var data = Stash.Drivers.Utils.assemble(value, expiration);
+      cache[key] = data;
+      callback && callback();
     };
 
-    Ephemeral.prototype.delete = function (key) {
-      key = key.split('/');
-      var last = key.pop();
-      var cache = Stash.Drivers.Utils.cd(this._cache_, key.join('/'));
+    Ephemeral.prototype.delete = function (key, callback) {
+      key = Stash.Drivers.Utils.key('', key);
+      var length = key.length;
 
-      cache[last] = null;
+      Object.keys(cache).forEach(function (_key) {
+        if (_key.substr(0, length) === key) {
+          cache[_key] = null;
+        }
+      });
+
+      cache[key] = null;
+      callback && callback();
     };
 
-    Ephemeral.prototype.flush = function () {
-      this._cache_ = {};
+    Ephemeral.prototype.flush = function (callback) {
+      cache = {};
+      callback && callback();
     };
-
-    Ephemeral.prototype.parent = Ephemeral.prototype;
 
     return Ephemeral;
   })();
