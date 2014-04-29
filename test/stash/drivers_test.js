@@ -135,6 +135,23 @@ describe('Stash::Drivers', function () {
           });
         });
 
+        context('#unlock', function () {
+
+          it('should unlock a key', function (done) {
+            var key = Math.random().toString();
+            driver.lock(key).then(function () {
+              return driver.unlock(key);
+            }).then(function () {
+              return driver.isLocked(key);
+            }).then(function (locked) {
+              catching(done, function () {
+                expect(locked).to.be.false;
+              });
+            });
+          });
+
+        });
+
       });
     })(driverName);
   }
