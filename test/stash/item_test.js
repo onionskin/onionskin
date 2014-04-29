@@ -229,7 +229,6 @@ describe('Stash::Item', function () {
 
   context('#lock', function () {
     it('should set cache as locked', function (done) {
-      console.log(foo.clear);
       foo.clear().then(function () {
         return foo.lock();
       }).then(function () {
