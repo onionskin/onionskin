@@ -66,7 +66,7 @@ describe('Stash::Item', function () {
 
     it('should unlock cache', function (done) {
       foo.lock().then(function () {
-        return foo.set('baz', 'bar');
+        return foo.set('baz');
       }).then(function () {
         return foo.isLocked(foo.key);
       }).then(function (locked) {
