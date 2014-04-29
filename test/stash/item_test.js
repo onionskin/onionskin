@@ -198,27 +198,47 @@ describe('Stash::Item', function () {
 
       context('SP_VALUE', function () {
         it('should return the specified value when locked', function () {
-          foo.set('bar');
-          foo.lock();
-          expect(foo.get(Stash.Item.SP_VALUE, 'baz')).to.be.equal('baz');
+          foo.set('bar').then(function () {
+            return foo.lock();
+          }).then(function () {
+            return foo.get(Stash.Item.SP_VALUE, 'baz');
+          }).then(function (value) {
+            catching(done, function () {
+              expect(value).to.be.equal('baz');
+            });
+          });
+        });
+      });
+
+    });
+  });
+
+  context('#clear', function () {
+    it('should immediately invalidate a key', function (done) {
+      foo.set('bar', 1000).then(function () {
+        return foo.clear();
+      }).then(function () {
+        return foo.get();
+      }).then(function (data) {
+        catching(done, function () {
+          expect(data).to.be.null;
         });
       });
     });
   });
 
-  context('#clear', function () {
-    it('should immediately invalidate a key', function () {
-      foo.set('bar', 1000);
-      foo.clear();
-      expect(foo.get()).to.be.null;
-    });
-  });
-
   context('#lock', function () {
-    it('should set cache as locked', function () {
-      foo.lock();
-      expect(foo.pool.drivers[0].get(foo.key).locked)
-        .to.be.true;
+    it('should set cache as locked', function (done) {
+      console.log(foo.clear);
+      foo.clear().then(function () {
+        return foo.lock();
+      }).then(function () {
+        return foo.pool.drivers[0].isLocked(foo.key);
+      }).then(function (locked) {
+        catching(done, function () {
+          expect(locked).to.be.true;
+        });
+      })
     });
   });
 });

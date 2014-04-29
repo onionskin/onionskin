@@ -116,13 +116,14 @@
     };
 
     Item.prototype.clear = function () {
-      var that = this;
-
+      var deferred = Q.defer();
       this._unload_();
 
       this.pool.drivers.forEach(function (driver) {
-        driver.delete(that.key);
-      });
+        driver.delete(this.key).then(deferred.resolve);
+      }.bind(this));
+
+      return deferred.promise;
     };
 
     Item.prototype.lock = function () {
