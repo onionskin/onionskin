@@ -88,6 +88,34 @@ describe('Stash::Drivers', function () {
             });
           });
         });
+
+        context('#isLocked', function () {
+          it('should return false for never locked keys', function (done) {
+            driver.isLocked('bar/bar/boom').then(function (locked) {
+              catching(done, function () {
+                expect(locked).to.be.false;
+              });
+            });
+          });
+
+          it('should return true after locking', function (done) {
+            driver.lock('baz/bar/boom2')
+            .then(function () {
+              return driver.isLocked('baz/bar/boom2');
+            })
+            .then(function (locked) {
+              catching(done, function () {
+                expect(locked).to.be.true;
+              });
+            });
+          });
+        });
+
+        context('#lock', function () {
+          it('should return a promise', function () {
+          });
+        });
+
       });
     })(driverName);
   }

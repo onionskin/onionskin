@@ -221,6 +221,11 @@
       return Q();
     };
 
+    Ephemeral.prototype.isLocked = function (key) {
+      key = Stash.Drivers.Utils.key('', key) + '_lock';
+      return Q(Boolean(cache[key]));
+    }
+
     return Ephemeral;
   })();
 
