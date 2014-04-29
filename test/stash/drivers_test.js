@@ -22,8 +22,9 @@ describe('Stash::Drivers', function () {
         context('#get', function () {
           it('should return null for nonexisting keys', function (done) {
             driver.get('foo').then(function (data) {
-              expect(data).to.be.null;
-              done();
+              catching(done, function () {
+                expect(data).to.be.null;
+              });
             });
           });
 
@@ -70,8 +71,9 @@ describe('Stash::Drivers', function () {
               return driver.get('foo');
             })
             .then(function (data) {
-              expect(data).to.be.null;
-              done();
+              catching(done, function () {
+                expect(data).to.be.null;
+              });
             });
           });
 
@@ -84,8 +86,9 @@ describe('Stash::Drivers', function () {
               return driver.get('foo/bar/baz')
             })
             .then(function (data) {
-              expect(data).to.be.null;
-              done();
+              catching(done, function () {
+                expect(data).to.be.null;
+              });
             });
           });
         });
