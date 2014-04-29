@@ -25,54 +25,88 @@ describe('Stash::Item', function () {
 
   context('#get', function () {
     it('should return null if no data is saved', function (done) {
-      foo.get(function (data) {
-        expect(data).to.be.null;
-        done();
-      })
+      foo.get().then(function (data) {
+        catching(done, function () {
+          expect(data).to.be.null;
+        });
+      });
     });
 
-    it('should use SP_NONE as default cache policy', function () {
-      foo.get();
-      expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+    it('should use SP_NONE as default cache policy', function (done) {
+      foo.get().then(function () {
+        catching(done, function () {
+          expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+        });
+      });
     });
 
     it('should call callback with data', function (done) {
-      foo.set('bar');
-      foo.get(function (data) {
-        expect(data).to.be.equal('bar');
-        done();
+      foo.set('bar')
+      .then(function () {
+        return foo.get();
+      })
+      .then(function (data) {
+        catching(done, function () {
+          expect(data).to.be.equal('bar');
+        });
       });
     });
   });
 
   context('#set', function () {
-    it('should set a value to an item', function () {
-      foo.set('bar');
-      expect(foo.get()).to.be.equal('bar');
+    it('should set a value to an item', function (done) {
+      foo.set('bar').then(function () {
+        return foo.get();
+      })
+      .then(function (data) {
+          expect(data).to.be.equal('bar');
+          done();
+      });
     });
 
     it('should unlock cache', function (done) {
-      foo.lock();
-      foo.set('baz');
-      expect(driver.get(foo.key).locked).to.be.false;
+      foo.lock().then(function () {
+        return foo.set('baz');
+      }).then(function () {
+        return driver.isLocked(foo.key);
+      }).then(function (locked) {
+        catching(done, function () {
+          expect(locked).to.be.true;
+        });
+      });
     });
 
     it('should call the callback', function (done) {
-      foo.set('baz', function (err) {
-        done();
+      foo.set('baz')
+      .then(function (err) {
+        catching(done, function () {});
       });
     });
   });
 
   context('#isMiss', function () {
-    it('should return true if cache is expired', function () {
-      foo.set('bar', -1);
-      expect(foo.isMiss()).to.be.true;
+    it('should return true if cache is expired', function (done) {
+      foo.set('bar', -1)
+      .then(function () {
+        return foo.isMiss();
+      })
+      .then(function (missed) {
+        catching(done, function () {
+          expect(missed).to.be.true;
+        });
+      });
     });
 
-    it('should return false when it is still valid', function () {
-      foo.set('bar', 100);
-      expect(foo.isMiss()).to.be.false;
+    it('should return false when it is still valid', function (done) {
+      foo.set('bar', 100)
+      .then(function () {
+        return foo.isMiss();
+      })
+      .then(function (missed) {
+        catching(done, function () {
+          expect(missed).to.be.false;
+        });
+      })
     });
 
     it('should accept an expiration Date', function () {
@@ -84,39 +118,71 @@ describe('Stash::Item', function () {
     });
 
     context('Expired & Locked', function () {
-      context('SP_NONE', function () {
+      context('SP_NONE', function (done) {
         it('should be the default cache policy', function () {
-          foo.get();
-          expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+          foo.get()
+          .then(function () {
+            catching(done, function () {
+              expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+            });
+          });
         });
 
-        it('should return true', function () {
-          foo.set('bar', -1);
-          foo.lock();
-          foo.get(Stash.Item.SP_NONE);
-          expect(foo.isMiss()).to.be.true;
+        it('should return true', function (done) {
+          foo.set('bar', -1).then(function () {
+            return foo.lock();
+          }).then(function () {
+            return foo.get(Stash.Item.SP_NONE);
+          }).then(function () {
+            return foo.isMiss();
+          }).then(function (missed) {
+            catching(done, function () {
+              expect(missed).to.be.true;
+            });
+          });
         });
       });
 
-      context('SP_OLD', function () {
-        it('should return the false if cache is locked', function () {
-          foo.lock();
-          foo.get(Stash.Item.SP_OLD);
-          expect(foo.isMiss()).to.be.false;
+      context('SP_OLD', function (done) {
+        it('should return false if cache is locked', function () {
+          foo.lock().then(function () {
+            return foo.get(Stash.Item.SP_OLD);
+          }).then(function () {
+            return foo.isMiss();
+          }).then(function (missed) {
+            catching(done, function () {
+              expect(missed).to.be.false;
+            });
+          });
         });
       });
 
       context('SP_PRECOMPUTE', function () {
-        it('should return true before expiration for a single instance', function () {
-          foo.set('bar', 100);
-          foo.get(Stash.Item.SP_PRECOMPUTE, 101);
+        it('should return true before expiration for a single instance', function (done) {
+          var bar;
 
-          expect(foo.isMiss()).to.be.true;
-          foo.lock();
-
-          var bar = pool.getItem(foo.key);
-          bar.get(Stash.Item.SP_PRECOMPUTE, 101);
-          expect(bar.isMiss()).to.be.false;
+          foo.set('bar', 100).then(function () {
+            return foo.get(Stash.Item.SP_PRECOMPUTE, 110);
+          }).then(function () {
+            return foo.isMiss();
+          }).then(function (missed) {
+            try {
+              expect(missed).to.be.true;
+            } catch (err) {
+              done(err);
+            }
+          }).then(function () {
+            return foo.lock();
+          }).then(function () {
+            bar = pool.getItem(foo.key);
+            return bar.get(Stash.Item.SP_PRECOMPUTE, 110);
+          }).then(function () {
+            return bar.isMiss();
+          }).then(function (missed) {
+            catching(done, function () {
+              expect(missed).to.be.false;
+            });
+          });
         });
       });
 

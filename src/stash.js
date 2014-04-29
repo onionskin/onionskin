@@ -25,32 +25,23 @@
     };
 
     Item.prototype._load_ = function (callback) {
-      var that = this;
+      var deferred = Q.defer();
 
-      var value = this.pool.drivers.reduce(function (a, b) {
-        return a || b.get(that.key, function (data) {
-          if (that && data) {
-            that.value = data.value;
-            that.expiration = data.expiration;
-            that.locked = data.locked;
-            callback && callback(that);
-            that = false;
-          }
-        });
-      }, false);
+      this.pool.drivers.forEach(function (d) {
+        return d.get(this.key).then(deferred.resolve);
+      }.bind(this));
 
-      return this;
+
+      return deferred.promise;
     };
 
     Item.prototype._write_ = function (callback) {
-      var that = this;
+      var deferred = Q.defer();
+      this.pool.drivers.reverse().forEach(function (d) {
+        return d.put(this.key, this.value, this.expiration).then(deferred.resolve);
+      }.bind(this));
 
-      this.pool.drivers.reverse().forEach(function (driver) {
-        driver.put(that.key, that.value, that.expiration, function (err) {
-          callback && callback(err);
-          callback = null;
-        });
-      });
+      return deferred.promise;
     };
 
     Item._calculateExpiration_ = function (expiration) {
@@ -65,16 +56,24 @@
     };
 
     Item.prototype.get = function (cachePolicy, policyData) {
+      var deferred = Q.defer();
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
       if ((cachePolicy & Stash.Item.SP_VALUE) && this.locked) {
-        return policyData;
+        deferred.resolve(policyData);
       }
 
-      return this._load_(function (item) {
-        callback && callback(item.value);
-      }).value;
+      this._load_().then(function (data) {
+        if (data) {
+          this.value = data.value;
+          this.expiration = data.expiration;
+          data = data.value || null;
+        }
+        deferred.resolve(data);
+      }.bind(this));
+
+      return deferred.promise;
     };
 
     Item.prototype.set = function (value, expiration, callback) {
@@ -88,22 +87,32 @@
       this.expiration = Item._calculateExpiration_(expiration);
       this.value = value;
 
-      this._write_(callback);
+      return this._write_().then(function () {
+        return this.unlock();
+      }.bind(this));
     };
 
     Item.prototype.isMiss = function (callback) {
-      this.isLocked(function (locked) {
+      var deferred = Q.defer();
+
+      this.isLocked().then(function (locked) {
+        var miss;
+
         if (locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
-          return false;
+          miss = false;
         } else if (!locked &&
                    (this.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
                    this.policyData * 1000 >= this.expiration - Date.now()) {
-          return true;
+          miss =  true;
+        } else {
+          miss = typeof(this.expiration) === 'number' &&
+            this.expiration < Date.now();
         }
 
-        var miss = typeof(this.expiration) === 'number' && this.expiration < Date.now();
-        callback(miss);
+        deferred.resolve(miss);
       }.bind(this));
+
+      return deferred.promise;
     };
 
     Item.prototype.clear = function () {
@@ -117,9 +126,23 @@
     };
 
     Item.prototype.lock = function () {
-      this.pool.drivers.forEach(function (driver) {
-        driver.lock(this.key)
+      var deferred = Q.defer();
+
+      this.pool.drivers.forEach(function (d) {
+        d.lock(this.key).then(deferred.resolve);
       }.bind(this));
+
+      return deferred.promise;
+    };
+
+    Item.prototype.isLocked = function () {
+      var deferred = Q.defer();
+
+      this.pool.drivers.forEach(function (d) {
+        d.isLocked(this.key).then(deferred.resolve);
+      }.bind(this));
+
+      return deferred.promise;
     };
 
     return Item;
