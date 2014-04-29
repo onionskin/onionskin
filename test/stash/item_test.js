@@ -109,12 +109,22 @@ describe('Stash::Item', function () {
       })
     });
 
-    it('should accept an expiration Date', function () {
-      foo.set('bar', new Date(Date.now() + 1000));
-      expect(foo.isMiss()).to.be.false;
-
-      foo.set('bar', new Date(Date.now() - 100));
-      expect(foo.isMiss()).to.be.true;
+    it('should accept an expiration Date', function (done) {
+      foo.set('bar', new Date(Date.now() + 1000)).then(function () {
+        return foo.isMiss();
+      }).then(function (missed) {
+        try {
+          expect(missed).to.be.false;
+        } catch(err) { done(err); }
+      }).then(function () {
+        return foo.set('bar', new Date(Date.now() - 100));
+      }).then(function () {
+        return foo.isMiss();
+      }).then(function (missed) {
+        catching(done, function () {
+          expect(missed).to.be.true;
+        });
+      });
     });
 
     context('Expired & Locked', function () {
