@@ -22,6 +22,14 @@
     <script src="stash/drivers/local_storage_browser.js"></script>
 
     <script>
+      function catching(done, fn) {
+        try {
+          fn();
+          done();
+        } catch (err) {
+          done(err);
+        }
+      }
       mocha.checkLeaks();
       mocha.globals(['jQuery']);
       mocha.run();
