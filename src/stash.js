@@ -317,7 +317,13 @@
       });
 
       return deferred.promise;
+    };
 
+    LocalStorage.prototype.unlock = function (key) {
+      key = Stash.Drivers.Utils.key(this.namespace, key) + '_lock';
+      localStorage.removeItem(key);
+
+      return Q();
     }
 
     return LocalStorage;
