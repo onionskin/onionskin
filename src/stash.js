@@ -276,6 +276,21 @@
       return this.delete('');
     };
 
+    LocalStorage.prototype.lock = function (key) {
+      key = Stash.Drivers.Utils.key(this.namespace, key) + '_lock';
+      return this.putRaw(key, 1);
+    };
+
+    LocalStorage.prototype.isLocked = function (key) {
+      var deferred = Q.defer();
+      this.get(key + '_lock').then(function (data) {
+        deferred.resolve(Boolean(data));
+      });
+
+      return deferred.promise;
+
+    }
+
     return LocalStorage;
   })();
 
