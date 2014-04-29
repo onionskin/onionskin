@@ -145,6 +145,14 @@
       return deferred.promise;
     };
 
+    Item.prototype.unlock = function () {
+      var deferred = Q.defer();
+      this.pool.drivers.forEach(function (d) {
+        d.unlock(this.key).then(deferred.resolve);
+      }.bind(this));
+      return deferred.promise;
+    }
+
     return Item;
   })();
 

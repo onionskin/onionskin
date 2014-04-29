@@ -66,12 +66,12 @@ describe('Stash::Item', function () {
 
     it('should unlock cache', function (done) {
       foo.lock().then(function () {
-        return foo.set('baz');
+        return foo.set('baz', 'bar');
       }).then(function () {
-        return driver.isLocked(foo.key);
+        return foo.isLocked(foo.key);
       }).then(function (locked) {
         catching(done, function () {
-          expect(locked).to.be.true;
+          expect(locked).to.be.false;
         });
       });
     });
