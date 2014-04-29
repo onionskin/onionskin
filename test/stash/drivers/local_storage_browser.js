@@ -6,17 +6,23 @@ describe('Stash::Drivers::LocalStorage', function () {
   pool.flush();
 
   it('should commit to localStorage', function () {
-    item.set('bar');
+    item.set('bar').then(function (done) {
+      catching(done, function () {
+        expect(localStorage.getItem(namespace))
+          .to.contain('bar');
+      });
+    })
     
-    expect(localStorage.getItem(namespace))
-      .to.contain('bar');
   });
 
-  it('should share cache between instances', function () {
+  it('should share cache between instances', function (done) {
     var content = 'foo bar baz';
-    item.set(content);
-
-    expect(new Stash.Drivers.LocalStorage(namespace).get(item.key).value)
-      .to.be.equal(content);
+    item.set(content).then(function () {
+      return new Stash.Drivers.LocalStorage(namespace).get(item.key);
+    }).then(function (data) {
+      catching(done, function () {
+        expect(data.value).to.be.equal(content);
+      });
+    });
   });
 });
