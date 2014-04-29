@@ -33,8 +33,9 @@ describe('Stash::Drivers', function () {
               return driver.get('a/b/c');
             })
             .then(function (data) {
+              catching(done, function () {
                 expect(data.value).to.be.equal('foo');
-                done();
+              });
             });
           });
         });
@@ -113,6 +114,24 @@ describe('Stash::Drivers', function () {
 
         context('#lock', function () {
           it('should return a promise', function () {
+            expect(Q.isPromise(driver.lock('foo'))).to.be.true;
+          });
+
+          it('should lock a key', function (done) {
+            var key = 'foo/123';
+            driver.isLocked(key).then(function (locked) {
+              try {
+                expect(locked).to.be.false;
+              } catch(err) { done(err); }
+            }).then(function () {
+              return driver.lock(key);
+            }).then(function () {
+              return driver.isLocked(key);
+            }).then(function (locked) {
+              catching(done, function () {
+                expect(locked).to.be.true;
+              });
+            });
           });
         });
 
