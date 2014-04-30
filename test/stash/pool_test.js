@@ -46,14 +46,14 @@ describe('Stash::Pool', function () {
 
     it('should allow save on fail', function (done) {
       pool.get('non_existing_key2').catch(function (err) {
-        this.save('bar').then(function () {
+        return this.set('bar');
+      }).then(function () {
           return pool.get('non_existing_key2');
-        }).then(function (data) {
-          catching(done, function () {
-            expect(data).to.be.equal('bar');
-          });
-        }).done();
-      });
+      }).then(function (data) {
+        catching(done, function () {
+          expect(data).to.be.equal('bar');
+        });
+      }).done();
     });
 
     it('should automatically lock', function (done) {
