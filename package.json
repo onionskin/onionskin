@@ -26,9 +26,19 @@
     "chai": "~1.9.1",
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "*",
-    "mocha": "~1.18.2"
+    "mocha": "~1.18.2",
+    "testling": "^1.6.1"
   },
   "dependencies": {
     "bluebird": "~1.2.4"
+  },
+  "testling": {
+    "harness": "mocha-bdd",
+    "files": ["test/test_helper.js", "test/*_test.js", "test/*/*_test.js", "test/*/*/*_test.js"],
+    "browsers": [
+      "ie/8..latest",
+      "chrome/latest",
+      "firefox/latest"
+    ]
   }
 }
