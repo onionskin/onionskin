@@ -20,18 +20,39 @@ Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/
 
 ### Basic Usage ###
 
+*Syntax Updated:* in order to add new models, I had to replace the old sync syntax, the new one is based on promises, and for using on the browser you will have to add the [Q](https://github.com/kriskowal/q) (on npm it will be installed as a dependency)
+
 ```javascript
+// Initialize a stash pool
 var stash = new Stash.Pool();
+
+// Short version 
+stash.get('my/key/path').then(function (data) {
+  callback(data):
+}).fail(function (set) {
+  someLongOperation(function (data) {
+    set(data);
+    callback(data);
+  });
+});
+
+// Long Version (stash.get does all of it internally)
+var deferred = Q.defer();
 var item = stash.getItem('my/key/path');
-var data = item.get();
 
-if (item.isMiss()) {
-  item.lock(); // Check invalidation options to see how it affects lock behavior
-
-  data = ...
-
-  item.set(data, cacheDuration);
-}
+item.get().then(function (data) {
+  item.isMiss().then(function (missed) {
+    if (missed) {
+      item.lock(); // Async locks
+      actuallyFetchData(function (data) {
+        item.set(data);
+        callback(data);
+      });
+    } else {
+      callback(data);
+    }
+  });
+});
 ```
 
 ### Managing drivers ###
