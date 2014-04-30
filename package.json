@@ -29,6 +29,6 @@
     "mocha": "~1.18.2"
   },
   "dependencies": {
-    "bluebird": "^1.2.4"
+    "bluebird": "~1.2.4"
   }
 }
