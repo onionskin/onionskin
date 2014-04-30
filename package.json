@@ -27,7 +27,7 @@
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "*",
     "mocha": "~1.18.2",
-    "testling": "^1.6.1"
+    "testling": "~1.6.1"
   },
   "dependencies": {
     "bluebird": "~1.2.4"
