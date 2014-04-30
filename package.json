@@ -26,8 +26,7 @@
     "chai": "~1.9.1",
     "codeclimate-test-reporter": "0.0.3",
     "istanbul": "*",
-    "mocha": "~1.18.2",
-    "testling": "~1.6.1"
+    "mocha": "~1.18.2"
   },
   "dependencies": {
     "bluebird": "~1.2.4"
