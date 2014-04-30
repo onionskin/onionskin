@@ -11,7 +11,11 @@
     function Item(key, pool) {
       this.key = key;
       this.pool = pool;
-      this.save = this.save.bind(this);
+      this.save = (function (that) {
+        return function () {
+          that.save.apply(that, arguments);
+        };
+      })(this);
 
       this._unload_();
     }
