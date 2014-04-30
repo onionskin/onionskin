@@ -20,7 +20,7 @@ Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/
 
 ### Basic Usage ###
 
-*Syntax Updated:* in order to add new models, I had to replace the old sync syntax, the new one is based on promises, and for using on the browser you will have to add the [Q](https://github.com/kriskowal/q) (on npm it will be installed as a dependency)
+*Syntax Updated:* in order to add new drivers, I had to replace the old sync syntax, the new one is based on promises, and it now depends on [bluebird](https://github.com/kriskowal/q)
 
 ```javascript
 // Initialize a stash pool
@@ -28,22 +28,24 @@ var stash = new Stash.Pool();
 
 // Short version 
 stash.get('my/key/path').then(function (data) {
+  // Data is cached and valid
   callback(data):
-}).fail(function (set) {
+}).catch(function (set) {
+  // Data is either inexistent or expired
   someLongOperation(function (data) {
+    // Store it on cache
     set(data);
     callback(data);
   });
 });
 
 // Long Version (stash.get does all of it internally)
-var deferred = Q.defer();
 var item = stash.getItem('my/key/path');
 
 item.get().then(function (data) {
   item.isMiss().then(function (missed) {
     if (missed) {
-      item.lock(); // Async locks
+      item.lock(); // Async lock
       actuallyFetchData(function (data) {
         item.set(data);
         callback(data);
