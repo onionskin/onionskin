@@ -22,6 +22,7 @@
     Item.prototype._unload_ = function () {
       this.value = null;
       this.expiration = false;
+      this.locked = undefined;
     };
 
     Item.prototype._load_ = function (callback) {
@@ -87,15 +88,14 @@
       this.expiration = Item._calculateExpiration_(expiration);
       this.value = value;
 
-      return this._write_().then(function () {
-        return this.unlock();
-      }.bind(this));
+      this.unlock();
+      return this._write_();
     };
 
     Item.prototype.isMiss = function (callback) {
       var deferred = Q.defer();
 
-      this.isLocked().then(function (locked) {
+      var  resolve = function (locked) {
         var miss;
 
         if (locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
@@ -111,7 +111,13 @@
         }
 
         deferred.resolve(miss);
-      }.bind(this));
+      }.bind(this);
+
+      if (this.locked !== undefined) {
+        resolve(this.locked);
+      } else {
+        this.isLocked().then(resolve);
+      }
 
       return deferred.promise;
     };
@@ -128,6 +134,11 @@
     };
 
     Item.prototype.lock = function () {
+      if (this.locked === true) {
+        return Q(this.locked);
+      }
+
+      this.locked = true;
       var deferred = Q.defer();
 
       this.pool.drivers.forEach(function (d) {
@@ -140,18 +151,32 @@
     Item.prototype.isLocked = function () {
       var deferred = Q.defer();
 
-      this.pool.drivers.forEach(function (d) {
-        d.isLocked(this.key).then(deferred.resolve);
-      }.bind(this));
+      if (this.locked !== undefined) {
+        deferred.resolve(this.locked);
+      } else {
+        this.pool.drivers.forEach(function (d) {
+          d.isLocked(this.key).then(function (locked) {
+            this.locked = locked;
+            deferred.resolve(locked);
+          }.bind(this));
+        }.bind(this));
+      }
 
       return deferred.promise;
     };
 
     Item.prototype.unlock = function () {
+      if (this.locked === false) {
+        return Q();
+      }
+
+      this.locked = false;
       var deferred = Q.defer();
+
       this.pool.drivers.forEach(function (d) {
         d.unlock(this.key).then(deferred.resolve);
       }.bind(this));
+
       return deferred.promise;
     }
 
