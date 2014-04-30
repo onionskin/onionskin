@@ -1,6 +1,7 @@
 var chai = require('chai'),
     Stash = require('../src/stash');
 
+global.Promise = require('bluebird');
 global.Stash = Stash;
 global.chai = chai;
 global.expect = chai.expect;
