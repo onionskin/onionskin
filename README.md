@@ -51,6 +51,8 @@ item.get().then(function (data) {
 });
 ```
 
+You can run the node.js samples on the `examples` folder to see a really basic demo
+
 ### Managing drivers ###
 
 ```javascript
