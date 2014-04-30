@@ -121,7 +121,7 @@ describe('Stash::Drivers', function () {
           });
 
           it('should lock a key', function (done) {
-            var key = 'foo/123';
+            var key = Math.random().toString();
             driver.isLocked(key).then(function (locked) {
               try {
                 expect(locked).to.be.false;
