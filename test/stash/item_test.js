@@ -135,8 +135,8 @@ describe('Stash::Item', function () {
     });
 
     context('Expired & Locked', function () {
-      context('SP_NONE', function (done) {
-        it('should be the default cache policy', function () {
+      context('SP_NONE', function () {
+        it('should be the default cache policy', function (done) {
           foo.get()
           .then(function () {
             catching(done, function () {
@@ -161,7 +161,7 @@ describe('Stash::Item', function () {
       });
 
       context('SP_OLD', function (done) {
-        it('should return false if cache is locked', function () {
+        it('should return false if cache is locked', function (done) {
           foo.lock().then(function () {
             return foo.get(Stash.Item.SP_OLD);
           }).then(function () {
@@ -204,7 +204,7 @@ describe('Stash::Item', function () {
       });
 
       context('SP_VALUE', function () {
-        it('should return the specified value when locked', function () {
+        it('should return the specified value when locked', function (done) {
           foo.set('bar').then(function () {
             return foo.lock();
           }).then(function () {

@@ -3,7 +3,7 @@
   var isNode = typeof require !== 'undefined';
 
   if (isNode) {
-    Q = require('q');
+    Promise = require('bluebird');
   }
 
   Stash.Item = (function () {
@@ -26,23 +26,23 @@
     };
 
     Item.prototype._load_ = function (callback) {
-      var deferred = Q.defer();
+      var that = this;
 
-      this.pool.drivers.forEach(function (d) {
-        return d.get(this.key).then(deferred.resolve);
-      }.bind(this));
-
-
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.forEach(function (d) {
+          d.get(that.key).then(resolve);
+        });
+      });
     };
 
     Item.prototype._write_ = function (callback) {
-      var deferred = Q.defer();
-      this.pool.drivers.reverse().forEach(function (d) {
-        return d.put(this.key, this.value, this.expiration).then(deferred.resolve);
-      }.bind(this));
+      var that = this;
 
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.reverse().forEach(function (d) {
+          d.put(that.key, that.value, that.expiration).then(resolve);
+        });
+      });
     };
 
     Item._calculateExpiration_ = function (expiration) {
@@ -57,24 +57,35 @@
     };
 
     Item.prototype.get = function (cachePolicy, policyData) {
-      var deferred = Q.defer();
+      var that = this;
       this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
       this.policyData = policyData;
 
-      if ((cachePolicy & Stash.Item.SP_VALUE) && this.locked) {
-        deferred.resolve(policyData);
+      function load(resolve) {
+        that._load_().then(function (data) {
+          if (data) {
+            that.value = data.value;
+            that.expiration = data.expiration;
+            data = data.value || null;
+          }
+
+          resolve(data);
+        });
       }
 
-      this._load_().then(function (data) {
-        if (data) {
-          this.value = data.value;
-          this.expiration = data.expiration;
-          data = data.value || null;
+      return new Promise(function (resolve, reject) {
+        if (that.cachePolicy & Stash.Item.SP_VALUE) {
+          that.isLocked().then(function (locked) {
+            if (locked) {
+              resolve(that.policyData);
+            } else {
+              load(resolve);
+            }
+          });
+        } else {
+          load(resolve);
         }
-        deferred.resolve(data);
-      }.bind(this));
-
-      return deferred.promise;
+      });
     };
 
     Item.prototype.set = function (value, expiration, callback) {
@@ -93,91 +104,92 @@
     };
 
     Item.prototype.isMiss = function (callback) {
-      var deferred = Q.defer();
+      var that = this;
 
-      var  resolve = function (locked) {
+      var isMissed = function (locked, resolve) {
         var miss;
 
-        if (locked && (this.cachePolicy & Stash.Item.SP_OLD)) {
+        if (locked && (that.cachePolicy & Stash.Item.SP_OLD)) {
           miss = false;
         } else if (!locked &&
-                   (this.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
-                   this.policyData * 1000 >= this.expiration - Date.now()) {
+                   (that.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
+                   that.policyData * 1000 >= that.expiration - Date.now()) {
           miss =  true;
         } else {
-          miss = this.value === null ||
-            typeof(this.expiration) === 'number' &&
-            this.expiration < Date.now();
+          miss = that.value === null ||
+            typeof(that.expiration) === 'number' &&
+            that.expiration < Date.now();
         }
 
-        deferred.resolve(miss);
-      }.bind(this);
-
-      if (this.locked !== undefined) {
-        resolve(this.locked);
-      } else {
-        this.isLocked().then(resolve);
+        resolve(miss);
       }
 
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        if (that.locked !== undefined) {
+          isMissed(that.locked, resolve);
+        } else {
+          that.isLocked().then(function (locked) {
+           isMissed(locked, resolve);
+          });
+        }
+      });
     };
 
     Item.prototype.clear = function () {
-      var deferred = Q.defer();
+      var that = this;
       this._unload_();
 
-      this.pool.drivers.forEach(function (driver) {
-        driver.delete(this.key).then(deferred.resolve);
-      }.bind(this));
-
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.forEach(function (driver) {
+          driver.delete(that.key).then(resolve);
+        });
+      });
     };
 
     Item.prototype.lock = function () {
       if (this.locked === true) {
-        return Q(this.locked);
+        return Promise.cast(this.locked);
       }
 
       this.locked = true;
-      var deferred = Q.defer();
+      var that = this;
 
-      this.pool.drivers.forEach(function (d) {
-        d.lock(this.key).then(deferred.resolve);
-      }.bind(this));
-
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.forEach(function (d) {
+          d.lock(that.key).then(resolve);
+        });
+      });
     };
 
     Item.prototype.isLocked = function () {
-      var deferred = Q.defer();
-
       if (this.locked !== undefined) {
-        deferred.resolve(this.locked);
-      } else {
-        this.pool.drivers.forEach(function (d) {
-          d.isLocked(this.key).then(function (locked) {
-            this.locked = locked;
-            deferred.resolve(locked);
-          }.bind(this));
-        }.bind(this));
+        return Promise.cast(this.locked);
       }
 
-      return deferred.promise;
+      var that = this;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.forEach(function (d) {
+          d.isLocked(that.key).then(function (locked) {
+            that.locked = locked;
+            resolve(locked);
+          });
+        });
+      });
     };
 
     Item.prototype.unlock = function () {
       if (this.locked === false) {
-        return Q();
+        return Promise.cast();
       }
 
       this.locked = false;
-      var deferred = Q.defer();
+      var that = this;
 
-      this.pool.drivers.forEach(function (d) {
-        d.unlock(this.key).then(deferred.resolve);
-      }.bind(this));
-
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        that.pool.drivers.forEach(function (d) {
+          d.unlock(that.key).then(resolve);
+        });
+      });
     }
 
     return Item;
@@ -208,20 +220,19 @@
 
     Pool.prototype.get = function (key) {
       var item = this.getItem(key);
-      var deferred = Q.defer();
 
-      item.get().then(function (data) {
-        item.isMiss().then(function (missed) {
-          if (missed) {
-            item.lock();
-            deferred.reject(item.set.bind(item));
-          } else {
-            deferred.resolve(data);
-          }
+      return new Promise(function (resolve, reject) {
+        item.get().then(function (data) {
+          item.isMiss().then(function (missed) {
+            if (missed) {
+              item.lock();
+              reject(item.set.bind(item));
+            } else {
+              resolve(data);
+            }
+          });
         });
       });
-
-      return deferred.promise;
     };
 
     return Pool;
@@ -262,14 +273,14 @@
         data = JSON.parse(data);
       }
 
-      return Q(data);
+      return Promise.cast(data);
     };
 
     Ephemeral.prototype.put = function (key, value, expiration) {
       key = Stash.Drivers.Utils.key('', key);
       var data = Stash.Drivers.Utils.assemble(value, expiration);
       cache[key] = data;
-      return Q();
+      return Promise.cast();
     };
 
     Ephemeral.prototype.delete = function (key) {
@@ -283,29 +294,29 @@
       });
 
       cache[key] = null;
-      return Q();
+      return Promise.cast();
     };
 
     Ephemeral.prototype.flush = function () {
       cache = {};
-      return Q();
+      return Promise.cast();
     };
 
     Ephemeral.prototype.lock = function (key) {
       var key = Stash.Drivers.Utils.key('', key) + '_lock';
       cache[key] = 1;
-      return Q();
+      return Promise.cast();
     };
 
     Ephemeral.prototype.isLocked = function (key) {
       key = Stash.Drivers.Utils.key('', key) + '_lock';
-      return Q(Boolean(cache[key]));
+      return Promise.cast(Boolean(cache[key]));
     }
 
     Ephemeral.prototype.unlock = function (key) {
       key = Stash.Drivers.Utils.key('', key) + '_lock';
       cache[key] = null;
-      return Q();
+      return Promise.cast();
     };
 
     return Ephemeral;
@@ -324,7 +335,7 @@
         data = JSON.parse(data);
       }
 
-      return Q(data);
+      return Promise.cast(data);
     }
 
     LocalStorage.prototype.put = function (key, value, expiration) {
@@ -336,7 +347,7 @@
 
     LocalStorage.prototype.putRaw = function (key, value) {
       localStorage.setItem(key, value);
-      return Q();
+      return Promise.cast();
     }
 
     LocalStorage.prototype.delete = function (key) {
@@ -351,7 +362,7 @@
       }
 
       localStorage.removeItem(key);
-      return Q();
+      return Promise.cast();
     };
 
     LocalStorage.prototype.flush = function () {
@@ -364,19 +375,19 @@
     };
 
     LocalStorage.prototype.isLocked = function (key) {
-      var deferred = Q.defer();
-      this.get(key + '_lock').then(function (data) {
-        deferred.resolve(Boolean(data));
+      var that = this;
+      return new Promise(function (resolve, reject) {
+        that.get(key + '_lock').then(function (data) {
+          resolve(Boolean(data));
+        });
       });
-
-      return deferred.promise;
     };
 
     LocalStorage.prototype.unlock = function (key) {
       key = Stash.Drivers.Utils.key(this.namespace, key) + '_lock';
       localStorage.removeItem(key);
 
-      return Q();
+      return Promise.cast();
     }
 
     return LocalStorage;

@@ -33,32 +33,32 @@ describe('Stash::Pool', function () {
         catching(done, function () {
           expect(data).to.be.equal(value);
         });
-      });
+      }).done();
     });
 
     it('should fail if the item isn\'t present', function (done) {
       pool.get('non_existing_key').then(function (data) {
         done(new Error('It should have failed', data));
-      }).fail(function () {
+      }).catch(function () {
         done();
       });
     });
 
     it('should expose set on fail', function (done) {
-      pool.get('non_existing_key2').fail(function (set) {
+      pool.get('non_existing_key2').catch(function (set) {
         set('bar').then(function () {
           return pool.get('non_existing_key2');
         }).then(function (data) {
           catching(done, function () {
             expect(data).to.be.equal('bar');
           });
-        });
+        }).done();
       });
     });
 
     it('should automatically lock', function (done) {
       var key = 'pool_get_3';
-      pool.get(key).fail(function (set) {
+      pool.get(key).catch(function (set) {
         pool.getItem(key).isLocked().then(function (locked) {
           catching(done, function () {
             expect(locked).to.be.true;

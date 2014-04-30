@@ -117,7 +117,7 @@ describe('Stash::Drivers', function () {
 
         context('#lock', function () {
           it('should return a promise', function () {
-            expect(Q.isPromise(driver.lock('foo'))).to.be.true;
+            expect(Promise.is(driver.lock('foo'))).to.be.true;
           });
 
           it('should lock a key', function (done) {
