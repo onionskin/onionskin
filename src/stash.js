@@ -67,7 +67,7 @@
           if (data) {
             that.value = data.value;
             that.expiration = data.expiration;
-            data = data.value || null;
+            data = typeof data.value === 'undefined' ? null : data.value;
           }
 
           resolve(data);
@@ -269,7 +269,7 @@
 
     Ephemeral.prototype.get = function (key) {
       key = Stash.Drivers.Utils.key('', key);
-      var data = cache[key] || null;
+      var data = typeof cache[key] === 'undefined' ? null : cache[key];
 
       if (data) {
         data = JSON.parse(data);
