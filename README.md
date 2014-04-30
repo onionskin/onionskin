@@ -26,17 +26,14 @@ Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/
 // Initialize a stash pool
 var stash = new Stash.Pool();
 
-// Short version 
-stash.get('my/key/path').then(function (data) {
-  // Data is cached and valid
-  callback(data):
-}).catch(function (set) {
+// Short version  -- with Promise
+
+stash.get('my/key/path').catch(function (err) {
   // Data is either inexistent or expired
   someLongOperation(function (data) {
-    // Store it on cache
-    set(data);
+    this.save(data); // Store it on cache
     callback(data);
-  });
+  }.bind(this));
 });
 
 // Long Version (stash.get does all of it internally)
