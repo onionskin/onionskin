@@ -1,5 +1,5 @@
-(function (exports) {
-  var Stash = exports.Stash || {};
+(function (global) {
+  var Stash = global.Stash || {};
   var isNode = typeof require !== 'undefined';
 
   if (isNode) {
@@ -357,5 +357,9 @@
     return LocalStorage;
   })();
 
-  exports.Stash = Stash;
-})(typeof(window) === 'undefined' ? module.exports : window);
+  if (isNode) {
+    module.exports = Stash;
+  } else {
+    global.Stash = Stash;
+  }
+})(this);

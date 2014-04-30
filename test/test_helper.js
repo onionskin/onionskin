@@ -1,5 +1,5 @@
 var chai = require('chai'),
-    Stash = require('../src/stash').Stash;
+    Stash = require('../src/stash');
 
 global.Stash = Stash;
 global.chai = chai;
