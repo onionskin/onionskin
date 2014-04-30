@@ -105,7 +105,8 @@
                    this.policyData * 1000 >= this.expiration - Date.now()) {
           miss =  true;
         } else {
-          miss = typeof(this.expiration) === 'number' &&
+          miss = this.value === null ||
+            typeof(this.expiration) === 'number' &&
             this.expiration < Date.now();
         }
 

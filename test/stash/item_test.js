@@ -85,6 +85,13 @@ describe('Stash::Item', function () {
   });
 
   context('#isMiss', function () {
+    it('should return true for non-existing key', function (done) {
+      pool.getItem('baz_foo/bar').isMiss().then(function (missed) {
+        catching(done, function () {
+          expect(missed).to.be.true;
+        });
+      });
+    });
     it('should return true if cache is expired', function (done) {
       foo.set('bar', -1)
       .then(function () {
