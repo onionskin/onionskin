@@ -44,9 +44,9 @@ describe('Stash::Pool', function () {
       });
     });
 
-    it('should expose set on fail', function (done) {
-      pool.get('non_existing_key2').catch(function (set) {
-        set('bar').then(function () {
+    it('should allow save on fail', function (done) {
+      pool.get('non_existing_key2').catch(function (err) {
+        this.save('bar').then(function () {
           return pool.get('non_existing_key2');
         }).then(function (data) {
           catching(done, function () {
@@ -58,7 +58,7 @@ describe('Stash::Pool', function () {
 
     it('should automatically lock', function (done) {
       var key = 'pool_get_3';
-      pool.get(key).catch(function (set) {
+      pool.get(key).catch(function (err) {
         pool.getItem(key).isLocked().then(function (locked) {
           catching(done, function () {
             expect(locked).to.be.true;

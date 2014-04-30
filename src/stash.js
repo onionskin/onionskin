@@ -227,13 +227,13 @@
           item.isMiss().then(function (missed) {
             if (missed) {
               item.lock();
-              reject(item.set.bind(item));
+              reject('Cache is missing');
             } else {
               resolve(data);
             }
           });
         });
-      });
+      }).bind(item);
     };
 
     return Pool;
