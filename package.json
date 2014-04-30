@@ -4,8 +4,7 @@
   "description": "Multilayer Cache Manager for JavaScript",
   "main": "src/stash.js",
   "scripts": {
-    "test": "istanbul cover _mocha -- test/*_test.js test/*/*_test.js test/*/*/*_test.js",
-    "posttest": "cat coverage/lcov.info | CODECLIMATE_REPO_TOKEN=cb7fefa26c479bc6dd7eb8dd8fa96ca07e41dbf1e75969bbacb4cf2c5db3a45b codeclimate"
+    "test": "mocha -- test/*_test.js test/*/*_test.js test/*/*/*_test.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "~1.9.1",
+    "codeclimate-test-reporter": "0.0.3",
     "mocha": "~1.18.2"
   },
   "dependencies": {
