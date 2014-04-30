@@ -89,6 +89,7 @@
       });
     };
 
+    Item.prototype.save = // alias for better syntax on Pool#get
     Item.prototype.set = function (value, expiration, callback) {
       if (typeof expiration === 'function') {
         callback = expiration;
