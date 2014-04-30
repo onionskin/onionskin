@@ -5,10 +5,10 @@ describe('Stash::Drivers::LocalStorage', function () {
   var item = pool.getItem('foo');
   pool.flush();
 
-  it('should commit to localStorage', function () {
-    item.set('bar').then(function (done) {
+  it('should commit to localStorage', function (done) {
+    item.set('bar').then(function () {
       catching(done, function () {
-        expect(localStorage.getItem(namespace))
+        expect(localStorage.getItem(Stash.Drivers.Utils.key(namespace, item.key)))
           .to.contain('bar');
       });
     })
