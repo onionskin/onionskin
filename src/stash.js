@@ -1,6 +1,7 @@
 (function (global) {
   var Stash = global.Stash || {};
   var isNode = typeof require !== 'undefined';
+  var Promise = global.Promise;
 
   if (isNode) {
     Promise = require('bluebird');
