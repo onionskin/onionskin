@@ -20,7 +20,7 @@ Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/
 
 ### Basic Usage ###
 
-*Syntax Updated:* in order to add new drivers, I had to replace the old sync syntax, the new one is based on promises, and it now depends on [bluebird](https://github.com/kriskowal/q)
+*Syntax Updated:* in order to add new drivers, I had to replace the old sync syntax, the new one is based on promises, and it now depends on [bluebird](https://github.com/petkaantonov/bluebird)
 
 ```javascript
 // Initialize a stash pool
@@ -58,7 +58,7 @@ You can run the node.js samples on the `examples` folder to see a really basic d
 ```javascript
 var ephemeral = new Stash.Drivers.Ephemeral();
 var localStorage = new Stash.Drivers.LocalStorage('my-custom-namespace');
-var pool = new Stash.Pool([ephemeral, localStorage]); // It read on this order, and writes in reverse order
+var pool = new Stash.Pool([ephemeral, localStorage]); // It reads on this order, and writes in reverse order
 ```
 
 ### Drivers ###
