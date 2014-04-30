@@ -30,10 +30,7 @@ var stash = new Stash.Pool();
 
 stash.get('my/key/path').catch(function (err) {
   // Data is either inexistent or expired
-  someLongOperation(function (data) {
-    this.save(data); // Store it on cache
-    callback(data);
-  }.bind(this));
+  return slowFuncThatReturnsPromise().then(this.save);
 });
 
 // Long Version (stash.get does all of it internally)

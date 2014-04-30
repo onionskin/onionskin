@@ -11,6 +11,7 @@
     function Item(key, pool) {
       this.key = key;
       this.pool = pool;
+      this.save = this.save.bind(this);
 
       this._unload_();
     }
@@ -89,8 +90,13 @@
       });
     };
 
-    Item.prototype.save = // alias for better syntax on Pool#get
-    Item.prototype.set = function (value, expiration, callback) {
+    // alias for better syntax on Pool#get
+    Item.prototype.save = function (value) {
+      this.set(value);
+      return value;
+    };
+
+    Item.prototype.set = function (value, expiration) {
       if (typeof expiration === 'function') {
         callback = expiration;
         expiration = null;
