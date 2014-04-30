@@ -181,6 +181,24 @@
       });
     };
 
+    Pool.prototype.get = function (key) {
+      var item = this.getItem(key);
+      var deferred = Q.defer();
+
+      item.get().then(function (data) {
+        item.isMiss().then(function (missed) {
+          if (missed) {
+            item.lock();
+            deferred.reject(item.set.bind(item));
+          } else {
+            deferred.resolve(data);
+          }
+        });
+      });
+
+      return deferred.promise;
+    };
+
     return Pool;
   })();
 
