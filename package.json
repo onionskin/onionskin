@@ -36,9 +36,14 @@
     "harness": "mocha-bdd",
     "files": ["test/test_helper.js", "test/*_test.js", "test/*/*_test.js", "test/*/*/*_test.js"],
     "browsers": [
-      "ie/8..latest",
-      "chrome/latest",
-      "firefox/latest"
+      "ie/9..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/5..latest",
+      "opera/11.0..latest",
+      "iphone/5..latest",
+      "ipad/5..latest",
+      "android-browser/4..latest"
     ]
   }
 }
