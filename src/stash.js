@@ -516,20 +516,26 @@
     };
 
     Memcached.prototype.isLocked = function (key) {
-      key = Stash.Drivers.Utils.key('', key + '_lock');
-      return this._get(key).then(function (locked) {
-        return Boolean(locked);
+      var that = this;
+      return this._key(key).then(function (key) {
+        return that._get(key + '_lock').then(function (locked) {
+          return Boolean(locked);
+        });
       });
     };
 
     Memcached.prototype.lock = function (key) {
-      key = Stash.Drivers.Utils.key('', key + '_lock');
-      return this._set(key, 1, 60);
+      var that = this;
+      return this._key(key).then(function (key) {
+        return that._set(key + '_lock', 1, 60);
+      });
     };
 
     Memcached.prototype.unlock = function (key) {
-      key = Stash.Drivers.Utils.key('', key + '_lock');
-      return this._del(key);
+      var that = this;
+      return this._key(key).then(function (key) {
+        return that._del(key + '_lock');
+      });
     };
 
     Memcached.prototype._key = function (key) {
