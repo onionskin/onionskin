@@ -10,10 +10,10 @@ Stash.Drivers = {
     return require('./stash/drivers/local_storage');
   },
   get Memcached() {
-    return require('./stash/drivers/Memcached');
+    return require('./stash/drivers/memcached');
   },
   get Redis() {
-    return require('./stash/drivers/Redis')
+    return require('./stash/drivers/redis')
   }
 };
 
