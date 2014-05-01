@@ -493,7 +493,7 @@
       var that = this;
       value = Stash.Drivers.Utils.assemble(value, expiration);
       return this._key(key).then(function (key) {
-        that._set(key, value, expiration || 0);
+        that._set(key, value, expiration || 604800);
       });
     };
 
