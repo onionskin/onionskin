@@ -12,7 +12,7 @@ module.exports = {
       key = [];
     }
     if (key instanceof Array) {
-      key.unshift(namespace);
+      key = [namespace].concat(key);
     } else {
       key = (namespace + '/' + key).split('/');
     }
