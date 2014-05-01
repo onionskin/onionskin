@@ -58,7 +58,7 @@ Item._calculateExpiration_ = function (expiration) {
 
 Item.prototype.get = function (cachePolicy, policyData) {
   var that = this;
-  this.cachePolicy = cachePolicy || Stash.Item.SP_NONE;
+  this.cachePolicy = cachePolicy || Item.SP_NONE;
   this.policyData = policyData;
 
   function load(resolve) {
@@ -74,7 +74,7 @@ Item.prototype.get = function (cachePolicy, policyData) {
   }
 
   return new Promise(function (resolve) {
-    if (that.cachePolicy & Stash.Item.SP_VALUE) {
+    if (that.cachePolicy & Item.SP_VALUE) {
       that.isLocked().then(function (locked) {
         if (locked) {
           resolve(that.policyData);
@@ -110,10 +110,10 @@ Item.prototype.isMiss = function () {
   var isMissed = function (locked, resolve) {
     var miss;
 
-    if (locked && (that.cachePolicy & Stash.Item.SP_OLD)) {
+    if (locked && (that.cachePolicy & Item.SP_OLD)) {
       miss = false;
     } else if (!locked &&
-               (that.cachePolicy & Stash.Item.SP_PRECOMPUTE) &&
+               (that.cachePolicy & Item.SP_PRECOMPUTE) &&
                that.policyData * 1000 >= that.expiration - Date.now()) {
       miss =  true;
     } else {
