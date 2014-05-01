@@ -7,10 +7,21 @@
 
 
   Stash.Drivers = {
-    Ephemeral: require('./stash/drivers/ephemeral'),
-    LocalStorage: require('./stash/drivers/local_storage'),
-    Memcached: require('./stash/drivers/Memcached'),
-    Redis: require('./stash/drivers/Redis')
+    get Utils() {
+      return require('./stash/drivers/utils');
+    },
+    get Ephemeral() {
+      return require('./stash/drivers/ephemeral');
+    },
+    get LocalStorage() {
+      return require('./stash/drivers/local_storage');
+    },
+    get Memcached() {
+      return require('./stash/drivers/Memcached');
+    },
+    get Redis() {
+      return require('./stash/drivers/Redis')
+    }
   };
 
   if (isNode) {
