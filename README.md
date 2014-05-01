@@ -58,15 +58,19 @@ You can run the node.js samples on the `examples` folder to see a really basic d
 ```javascript
 var ephemeral = new Stash.Drivers.Ephemeral();
 var localStorage = new Stash.Drivers.LocalStorage('my-custom-namespace');
-var pool = new Stash.Pool([ephemeral, localStorage]); // It reads on this order, and writes in reverse order
+var redis = new Stash.Drivers.Redis(); // Config info available below
+
+var clientPool = new Stash.Pool([ephemeral, localStorage]); // It reads on this order, and writes in reverse order
+var serverPool = new Stash.Pool([ephemeral, redis]);
 ```
 
 ### Drivers ###
 
-Right now there are just this two drivers
+Right now there are just this three drivers
 
 * Ephemeral - runtime only
 * LocalStorage - saves on browser localStorage
+* Redis - uses [node-redis](https://github.com/mranney/node_redis/) to store cache on redis, All parameters passed to the constructor will be passed to `redis.createClient()`
 
 I should create some extra drivers in a really near future... If you want to contribute with some driver, just fork e send me a pull request, will be happy to merge! =)
 
