@@ -96,3 +96,4 @@ There are 4 cache policies right now:
 ## Contact ##
 
 Feel free to share any doubts, thoughts or even complaints, either on the [issues](https://github.com/tadeuzagallo/stash.js/issues), via [email](mailto:tadeuzagallo@gmail.com) or [send me a tweet](https://twitter.com/tadeuzagallo)!
+
