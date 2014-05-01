@@ -31,20 +31,20 @@
       this.locked = undefined;
     };
 
-    Item.prototype._load_ = function (callback) {
+    Item.prototype._load_ = function () {
       var that = this;
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.forEach(function (d) {
           d.get(that.key).then(resolve);
         });
       });
     };
 
-    Item.prototype._write_ = function (callback) {
+    Item.prototype._write_ = function () {
       var that = this;
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.reverse().forEach(function (d) {
           d.put(that.key, that.value, that.expiration).then(resolve);
         });
@@ -79,7 +79,7 @@
         });
       }
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         if (that.cachePolicy & Stash.Item.SP_VALUE) {
           that.isLocked().then(function (locked) {
             if (locked) {
@@ -101,11 +101,6 @@
     };
 
     Item.prototype.set = function (value, expiration) {
-      if (typeof expiration === 'function') {
-        callback = expiration;
-        expiration = null;
-      }
-
       this._unload_();
 
       this.expiration = Item._calculateExpiration_(expiration);
@@ -134,9 +129,9 @@
         }
 
         resolve(miss);
-      }
+      };
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         if (that.locked !== undefined) {
           isMissed(that.locked, resolve);
         } else {
@@ -151,7 +146,7 @@
       var that = this;
       this._unload_();
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.forEach(function (driver) {
           driver.delete(that.key).then(resolve);
         });
@@ -166,7 +161,7 @@
       this.locked = true;
       var that = this;
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.forEach(function (d) {
           d.lock(that.key).then(resolve);
         });
@@ -179,7 +174,7 @@
       }
 
       var that = this;
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.forEach(function (d) {
           d.isLocked(that.key).then(function (locked) {
             that.locked = locked;
@@ -197,12 +192,12 @@
       this.locked = false;
       var that = this;
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.pool.drivers.forEach(function (d) {
           d.unlock(that.key).then(resolve);
         });
       });
-    }
+    };
 
     return Item;
   })();
@@ -318,7 +313,7 @@
     };
 
     Ephemeral.prototype.lock = function (key) {
-      var key = Stash.Drivers.Utils.key('', key) + '_lock';
+      key = Stash.Drivers.Utils.key('', key) + '_lock';
       cache[key] = 1;
       return Promise.cast();
     };
@@ -326,7 +321,7 @@
     Ephemeral.prototype.isLocked = function (key) {
       key = Stash.Drivers.Utils.key('', key) + '_lock';
       return Promise.cast(Boolean(cache[key]));
-    }
+    };
 
     Ephemeral.prototype.unlock = function (key) {
       key = Stash.Drivers.Utils.key('', key) + '_lock';
@@ -353,7 +348,7 @@
       }
 
       return Promise.cast(data);
-    }
+    };
 
     LocalStorage.prototype.put = function (key, value, expiration) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
@@ -365,7 +360,7 @@
     LocalStorage.prototype.putRaw = function (key, value) {
       localStorage.setItem(key, value);
       return Promise.cast();
-    }
+    };
 
     LocalStorage.prototype.delete = function (key) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
@@ -393,7 +388,7 @@
 
     LocalStorage.prototype.isLocked = function (key) {
       var that = this;
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         that.get(key + '_lock').then(function (data) {
           resolve(Boolean(data));
         });
@@ -405,7 +400,7 @@
       localStorage.removeItem(key);
 
       return Promise.cast();
-    }
+    };
 
     return LocalStorage;
   })();
@@ -500,7 +495,7 @@
       return this._key(key).then(function (key) {
         that._set(key, value, expiration || 0);
       });
-    }
+    };
 
     Memcached.prototype.get = function (key) {
       var that = this;
@@ -510,12 +505,12 @@
       }).then(function (data) {
         return data ? JSON.parse(data) : (data || null);
       });
-    }
+    };
 
     Memcached.prototype.delete = function (key) {
       var that = this;
       return this._key(key).then(function (key) {
-        key = key.replace(/\d+$/, '_ns')
+        key = key.replace(/\d+$/, '_ns');
         return that._incr(key, 1);
       });
     };
@@ -549,7 +544,7 @@
             return path;
           };
 
-          if (count == false) {
+          if (count === false) {
             count = Date.now();
             return that._set(path.join('/') + '_ns', count, 0).then(function () {
               return commit(path, key, count);
