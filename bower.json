@@ -10,20 +10,26 @@
     "cache",
     "manager",
     "library",
-    "javascript"
+    "javascript",
+    "multilayer",
+    "redis",
+    "memcached",
+    "localStorage",
+    "ephemeral"
   ],
   "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
-    "spec"
+    "test",
+    "src",
+    "coverage",
+    "examples",
+    "Makefile"
   ],
   "devDependencies": {
     "mocha": "~1.18.2",
     "chai": "~1.9.1"
-  },
-  "dependencies": {
-    "bluebird": "~1.2.4"
   }
 }

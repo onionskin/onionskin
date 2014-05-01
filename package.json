@@ -14,7 +14,13 @@
     "stash",
     "cache",
     "manager",
-    "multilayer"
+    "library",
+    "javascript",
+    "multilayer",
+    "redis",
+    "memcached",
+    "localStorage",
+    "ephemeral"
   ],
   "author": "Tadeu Zagallo <tadeuzagallo@gmail.com>",
   "license": "MIT",
