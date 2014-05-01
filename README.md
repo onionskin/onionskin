@@ -1,4 +1,4 @@
-# Stash.js [![Build Status](https://travis-ci.org/tadeuzagallo/stash.js.svg?branch=master)](https://travis-ci.org/tadeuzagallo/stash.js) [![Code Climate](https://codeclimate.com/github/tadeuzagallo/stash.js.png)](https://codeclimate.com/github/tadeuzagallo/stash.js) [![Code Climate Coverage](https://codeclimate.com/github/tadeuzagallo/stash.js/coverage.png)](https://codeclimate.com/github/tadeuzagallo/stash.js) #
+# Stash.js [![Build Status](https://travis-ci.org/tadeuzagallo/stash.js.svg?branch=master)](https://travis-ci.org/tadeuzagallo/stash.js) [![Code Climate](https://codeclimate.com/github/tadeuzagallo/stash.js.png?v1.1.0)](https://codeclimate.com/github/tadeuzagallo/stash.js) [![Code Climate Coverage](https://codeclimate.com/github/tadeuzagallo/stash.js/coverage.png?v1.1.0)](https://codeclimate.com/github/tadeuzagallo/stash.js) #
 
 Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it easier to save your data on multiple layers of cache
 
