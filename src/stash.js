@@ -418,6 +418,8 @@
       this._set = Promise.promisify(this.client.set, this.client);
       this._del = Promise.promisify(this.client.del, this.client);
       this._keys = Promise.promisify(this.client.keys, this.client);
+
+      this.flush = Promise.promisify(this.client.flushdb, this.client);
     }
 
     Redis.available = (function () {
@@ -467,10 +469,6 @@
       return this._get(key).then(function (value) {
         return Boolean(value);
       });
-    };
-
-    Redis.prototype.flush = function () {
-      return Promise.cast();
     };
 
     return Redis;

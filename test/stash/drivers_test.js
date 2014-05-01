@@ -22,7 +22,9 @@ describe('Stash::Drivers', function () {
 
         var driver = new Driver();
         before(function (done) {
-          driver.flush().then(done);
+          driver.flush().then(function () {
+            done();
+          });
         });
 
         context('#get', function () {
