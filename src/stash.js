@@ -7,7 +7,6 @@
 
 
   Stash.Drivers = {
-    Utils: require('./stash/drivers/utils'),
     Ephemeral: require('./stash/drivers/ephemeral'),
     LocalStorage: require('./stash/drivers/local_storage'),
     Memcached: require('./stash/drivers/Memcached'),

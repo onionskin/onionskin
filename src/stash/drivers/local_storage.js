@@ -1,6 +1,7 @@
 module.exports = LocalStorage;
 
 var Promise = require('bluebird');
+var Utils = require('./Utils');
 
 function LocalStorage (namespace) {
   this.namespace = namespace || 'stash';
@@ -9,7 +10,7 @@ function LocalStorage (namespace) {
 LocalStorage.available = typeof localStorage !== 'undefined';
 
 LocalStorage.prototype.get = function (key) {
-  key = Stash.Drivers.Utils.key(this.namespace, key);
+  key = Utils.key(this.namespace, key);
   var data = localStorage.getItem(key);
   
   if (data) {
@@ -20,8 +21,8 @@ LocalStorage.prototype.get = function (key) {
 };
 
 LocalStorage.prototype.put = function (key, value, expiration) {
-  key = Stash.Drivers.Utils.key(this.namespace, key);
-  var data = Stash.Drivers.Utils.assemble(value, expiration);
+  key = Utils.key(this.namespace, key);
+  var data = Utils.assemble(value, expiration);
 
   return this.putRaw(key, data);
 };
@@ -32,7 +33,7 @@ LocalStorage.prototype.putRaw = function (key, value) {
 };
 
 LocalStorage.prototype.delete = function (key) {
-  key = Stash.Drivers.Utils.key(this.namespace, key);
+  key = Utils.key(this.namespace, key);
   var length = key.length;
 
   for (var i = 0, l = localStorage.length; i < l; i++) {
@@ -51,7 +52,7 @@ LocalStorage.prototype.flush = function () {
 };
 
 LocalStorage.prototype.lock = function (key) {
-  key = Stash.Drivers.Utils.key(this.namespace, key) + '_lock';
+  key = Utils.key(this.namespace, key) + '_lock';
   return this.putRaw(key, 1);
 };
 
@@ -65,7 +66,7 @@ LocalStorage.prototype.isLocked = function (key) {
 };
 
 LocalStorage.prototype.unlock = function (key) {
-  key = Stash.Drivers.Utils.key(this.namespace, key) + '_lock';
+  key = Utils.key(this.namespace, key) + '_lock';
   localStorage.removeItem(key);
 
   return Promise.cast();

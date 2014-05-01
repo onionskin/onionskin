@@ -1,6 +1,7 @@
 module.exports = Memcached;
 
 var Promise = require('bluebird');
+var Utils = require('./utils');
 
 function Memcached(serverLocations, options) {
   var MemcachedLib = require('memcached');
@@ -23,7 +24,7 @@ Memcached.available = (function () {
 
 Memcached.prototype.put = function (key, value, expiration) {
   var that = this;
-  value = Stash.Drivers.Utils.assemble(value, expiration);
+  value = Utils.assemble(value, expiration);
   return this._key(key).then(function (key) {
     that._set(key, value, expiration || 604800);
   });
@@ -72,7 +73,7 @@ Memcached.prototype.unlock = function (key) {
 
 Memcached.prototype._key = function (key) {
   var that = this;
-  key = Stash.Drivers.Utils.key([], key);
+  key = Utils.key([], key);
   return Promise.reduce(key.split('/'), function (path, key) {
     path.push(key);
     return that._get(path.join('/') + '_ns').then(function (count) {
