@@ -6,8 +6,9 @@ function Item(key, pool) {
   this.key = key;
   this.pool = pool;
   this.save = (function (that) {
+    var _save = that.save;
     return function () {
-      that.save.apply(that, arguments);
+      return _save.apply(that, arguments);
     };
   })(this);
 

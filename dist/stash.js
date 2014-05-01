@@ -166,7 +166,9 @@ Async.prototype._reset = function Async$_reset() {
 
 module.exports = new Async();
 
-},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"EjIH/G":[function(require,module,exports){
+},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"bluebird":[function(require,module,exports){
+module.exports=require('EjIH/G');
+},{}],"EjIH/G":[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -192,9 +194,7 @@ module.exports = new Async();
 "use strict";
 var Promise = require("./promise.js")();
 module.exports = Promise;
-},{"./promise.js":20}],"bluebird":[function(require,module,exports){
-module.exports=require('EjIH/G');
-},{}],5:[function(require,module,exports){
+},{"./promise.js":20}],5:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5221,8 +5221,9 @@ function Item(key, pool) {
   this.key = key;
   this.pool = pool;
   this.save = (function (that) {
+    var _save = that.save;
     return function () {
-      that.save.apply(that, arguments);
+      return _save.apply(that, arguments);
     };
   })(this);
 
