@@ -1,0 +1,85 @@
+<html>
+<head>
+  <title>Stash.js Facebook example</title>
+</head>
+<body>
+  <h1>Stash.js client side usage example</h1>
+  <h3>Consuming Facebook API</h3>
+  <form name="facebook" action="#">
+    <input type="text" name="username" size="40" placeholder="Facebook username">
+    <input type="submit" value="fecth">
+  </form>
+
+  <p id="loader" style="display: none;">Loading...</p>
+
+  <div id="profile" style="display: none;">
+    <img class="pic" alt="user name" src="">
+    <b class="name">User Name</b>
+  </div>
+
+  <script src="../dist/stash.js"></script>
+  <script>
+(function () {
+  var Stash = require('stash');
+  var Promise = require('bluebird');
+  var stash = new Stash.Pool([
+    new Stash.Drivers.Ephemeral(),
+    new Stash.Drivers.LocalStorage()
+  ]);
+
+  var loader = document.getElementById('loader');
+  var profile = document.getElementById('profile');
+  var pic = profile.querySelector('.pic');
+  var name = profile.querySelector('.name');
+
+  document.facebook.onsubmit = function (e) {
+    e.preventDefault();
+    loader.style.display = 'block';
+
+    publicUserData(this.username.value)
+    .then(fillProfile)
+    .catch(function (err) {
+      console.log(err.message, err.stack);
+      profile.style.display = 'none';
+      alert('could not load user data');
+    })
+    .finally(function () {
+      loader.style.display = 'none';
+    }).done();
+  };
+
+  function publicUserData(username) {
+    return stash.get(['facebook', username])
+    .catch(function () {
+      console.log(arguments);
+      return requestUserData(username).then(this.save);
+    });
+  }
+
+  function requestUserData(username) {
+    return  new Promise(function (resolve, reject) {
+      var request = new XMLHttpRequest();
+      request.open('GET', 'http://graph.facebook.com/' + username, true);
+      request.onload = function () {
+        if (request.status === 200) {
+          resolve(JSON.parse(request.response));
+        } else {
+          reject(request.statusText);
+        }
+      };
+
+      request.onerror = reject;
+      request.send(null);
+    });
+  }
+
+  function fillProfile(data) {
+    profile.style.display = 'block';
+    pic.src = 'http://graph.facebook.com/' + data.username + '/picture';
+    pic.alt = data.name;
+    name.innerHTML = data.name;
+  }
+})();
+  </script>
+</body>
+</html>
