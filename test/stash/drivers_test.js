@@ -10,11 +10,17 @@ describe('Stash::Drivers', function () {
 
     (function (driverName) {
       context('::' + driverName, function () {
+        var Driver = Stash.Drivers[driverName];
+
         it('should contain an ' + driverName + ' driver', function () {
-          expect(Stash.Drivers[driverName]).to.be.an('function');
+          expect(Driver).to.be.an('function');
         });
 
-        var driver = new Stash.Drivers[driverName]();
+        if (!Driver.available) {
+          return;
+        }
+
+        var driver = new Driver();
         before(function (done) {
           driver.flush().then(done);
         });

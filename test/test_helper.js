@@ -1,19 +1,3 @@
-var chai = require('chai'),
-    Stash = require('../src/stash');
-
-global.Promise = require('bluebird');
-global.Stash = Stash;
-global.chai = chai;
-global.expect = chai.expect;
-global.catching = function (done, fn) {
-  try {
-    fn();
-    done();
-  } catch (err) {
-    done(err);
-  }
-};
-
 global.localStorage = (function () {
   var cache = {};
 
@@ -35,5 +19,22 @@ global.localStorage = (function () {
     }
   }
 })();
+
+var chai = require('chai'),
+    Stash = require('../src/stash');
+
+global.Promise = require('bluebird');
+global.Stash = Stash;
+global.chai = chai;
+global.expect = chai.expect;
+global.catching = function (done, fn) {
+  try {
+    fn();
+    done();
+  } catch (err) {
+    done(err);
+  }
+};
+
 
 chai.should();

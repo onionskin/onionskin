@@ -277,6 +277,8 @@
     var cache = {};
     function Ephemeral () {}
 
+    Ephemeral.available = true;
+
     Ephemeral.prototype.get = function (key) {
       key = Stash.Drivers.Utils.key('', key);
       var data = typeof cache[key] === 'undefined' ? null : cache[key];
@@ -338,6 +340,8 @@
     function LocalStorage (namespace) {
       this.namespace = namespace || 'stash';
     }
+
+    LocalStorage.available = typeof localStorage !== 'undefined';
 
     LocalStorage.prototype.get = function (key) {
       key = Stash.Drivers.Utils.key(this.namespace, key);
@@ -415,6 +419,15 @@
       this._del = Promise.promisify(this.client.del, this.client);
       this._keys = Promise.promisify(this.client.keys, this.client);
     }
+
+    Redis.available = (function () {
+      try {
+        require.resolve('redis');
+        return true;
+      } catch (err) {
+        return false;
+      }
+    })();
 
     Redis.prototype.put = function (key, value, expiration) {
       key = Stash.Drivers.Utils.key('', key);
