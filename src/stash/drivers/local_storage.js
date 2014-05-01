@@ -1,5 +1,7 @@
 module.exports = LocalStorage;
 
+var Promise = require('bluebird');
+
 function LocalStorage (namespace) {
   this.namespace = namespace || 'stash';
 }

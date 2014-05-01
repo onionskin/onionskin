@@ -1,4 +1,5 @@
 module.exports = Pool;
+var Promise = require('bluebird');
 
 function Pool(drivers) {
   if (!drivers) {

@@ -1,6 +1,8 @@
 module.exports = Ephemeral;
 
+var Promise = require('bluebird');
 var cache = {};
+
 function Ephemeral () {}
 
 Ephemeral.available = true;

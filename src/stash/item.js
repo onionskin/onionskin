@@ -1,5 +1,7 @@
 module.exports = Item;
 
+var Promise = require('bluebird');
+
 function Item(key, pool) {
   this.key = key;
   this.pool = pool;

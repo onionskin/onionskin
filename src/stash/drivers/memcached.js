@@ -1,5 +1,7 @@
 module.exports = Memcached;
 
+var Promise = require('bluebird');
+
 function Memcached(serverLocations, options) {
   var MemcachedLib = require('memcached');
   this.client = new MemcachedLib(serverLocations, options);

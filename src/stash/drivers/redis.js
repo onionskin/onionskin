@@ -1,5 +1,7 @@
 module.exports = Redis;
 
+var Promise = require('bluebird');
+
 function Redis () {
   var redis = require('redis');
   this.client = redis.createClient.apply(redis, arguments);

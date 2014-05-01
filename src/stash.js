@@ -1,11 +1,6 @@
 (function (global) {
   var Stash = global.Stash || {};
   var isNode = typeof require !== 'undefined';
-  var Promise = global.Promise;
-
-  if (isNode) {
-    Promise = require('bluebird');
-  }
 
   Stash.Item = require('./stash/item');
   Stash.Pool = require('./stash/pool');
