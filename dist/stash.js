@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Stash=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -24,7 +24,7 @@
 "use strict";
 module.exports = function(Promise, Promise$_CreatePromiseArray, PromiseArray) {
 
-var SomePromiseArray = _dereq_("./some_promise_array.js")(PromiseArray);
+var SomePromiseArray = require("./some_promise_array.js")(PromiseArray);
 function Promise$_Any(promises, useBound) {
     var ret = Promise$_CreatePromiseArray(
         promises,
@@ -53,7 +53,7 @@ Promise.prototype.any = function Promise$any() {
 
 };
 
-},{"./some_promise_array.js":33}],2:[function(_dereq_,module,exports){
+},{"./some_promise_array.js":34}],2:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -77,11 +77,11 @@ Promise.prototype.any = function Promise$any() {
  * 
  */
 "use strict";
-var schedule = _dereq_("./schedule.js");
-var Queue = _dereq_("./queue.js");
-var errorObj = _dereq_("./util.js").errorObj;
-var tryCatch1 = _dereq_("./util.js").tryCatch1;
-var process = _dereq_("./global.js").process;
+var schedule = require("./schedule.js");
+var Queue = require("./queue.js");
+var errorObj = require("./util.js").errorObj;
+var tryCatch1 = require("./util.js").tryCatch1;
+var process = require("./global.js").process;
 
 function Async() {
     this._isTickUsed = false;
@@ -166,7 +166,7 @@ Async.prototype._reset = function Async$_reset() {
 
 module.exports = new Async();
 
-},{"./global.js":15,"./queue.js":26,"./schedule.js":29,"./util.js":37}],3:[function(_dereq_,module,exports){
+},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"EjIH/G":[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -190,9 +190,11 @@ module.exports = new Async();
  * 
  */
 "use strict";
-var Promise = _dereq_("./promise.js")();
+var Promise = require("./promise.js")();
 module.exports = Promise;
-},{"./promise.js":19}],4:[function(_dereq_,module,exports){
+},{"./promise.js":20}],"bluebird":[function(require,module,exports){
+module.exports=require('EjIH/G');
+},{}],5:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -247,7 +249,7 @@ Promise.prototype.get = function Promise$get(propertyName) {
 };
 };
 
-},{}],5:[function(_dereq_,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -272,8 +274,8 @@ Promise.prototype.get = function Promise$get(propertyName) {
  */
 "use strict";
 module.exports = function(Promise, INTERNAL) {
-var errors = _dereq_("./errors.js");
-var async = _dereq_("./async.js");
+var errors = require("./errors.js");
+var async = require("./async.js");
 var CancellationError = errors.CancellationError;
 
 Promise.prototype._cancel = function Promise$_cancel() {
@@ -322,7 +324,7 @@ function Promise$fork(didFulfill, didReject, didProgress) {
 };
 };
 
-},{"./async.js":2,"./errors.js":9}],6:[function(_dereq_,module,exports){
+},{"./async.js":2,"./errors.js":10}],7:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -347,8 +349,8 @@ function Promise$fork(didFulfill, didReject, didProgress) {
  */
 "use strict";
 module.exports = function() {
-var inherits = _dereq_("./util.js").inherits;
-var defineProperty = _dereq_("./es5.js").defineProperty;
+var inherits = require("./util.js").inherits;
+var defineProperty = require("./es5.js").defineProperty;
 
 var rignore = new RegExp(
     "\\b(?:[a-zA-Z0-9.]+\\$_\\w+|" +
@@ -546,7 +548,7 @@ var captureStackTrace = (function stackDetection() {
 return CapturedTrace;
 };
 
-},{"./es5.js":11,"./util.js":37}],7:[function(_dereq_,module,exports){
+},{"./es5.js":12,"./util.js":38}],8:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -571,11 +573,11 @@ return CapturedTrace;
  */
 "use strict";
 module.exports = function(NEXT_FILTER) {
-var util = _dereq_("./util.js");
-var errors = _dereq_("./errors.js");
+var util = require("./util.js");
+var errors = require("./errors.js");
 var tryCatch1 = util.tryCatch1;
 var errorObj = util.errorObj;
-var keys = _dereq_("./es5.js").keys;
+var keys = require("./es5.js").keys;
 var TypeError = errors.TypeError;
 
 function CatchFilter(instances, callback, promise) {
@@ -642,7 +644,7 @@ CatchFilter.prototype.doFilter = function CatchFilter$_doFilter(e) {
 return CatchFilter;
 };
 
-},{"./errors.js":9,"./es5.js":11,"./util.js":37}],8:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./es5.js":12,"./util.js":38}],9:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -666,7 +668,7 @@ return CatchFilter;
  * 
  */
 "use strict";
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var isPrimitive = util.isPrimitive;
 var wrapsPrimitiveReceiver = util.wrapsPrimitiveReceiver;
 
@@ -723,7 +725,7 @@ function Promise$thenThrow(reason) {
 };
 };
 
-},{"./util.js":37}],9:[function(_dereq_,module,exports){
+},{"./util.js":38}],10:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -747,9 +749,9 @@ function Promise$thenThrow(reason) {
  * 
  */
 "use strict";
-var global = _dereq_("./global.js");
-var Objectfreeze = _dereq_("./es5.js").freeze;
-var util = _dereq_("./util.js");
+var global = require("./global.js");
+var Objectfreeze = require("./es5.js").freeze;
+var util = require("./util.js");
 var inherits = util.inherits;
 var notEnumerableProp = util.notEnumerableProp;
 var Error = global.Error;
@@ -839,7 +841,7 @@ module.exports = {
     canAttach: canAttach
 };
 
-},{"./es5.js":11,"./global.js":15,"./util.js":37}],10:[function(_dereq_,module,exports){
+},{"./es5.js":12,"./global.js":16,"./util.js":38}],11:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -864,7 +866,7 @@ module.exports = {
  */
 "use strict";
 module.exports = function(Promise) {
-var TypeError = _dereq_('./errors.js').TypeError;
+var TypeError = require('./errors.js').TypeError;
 
 function apiRejection(msg) {
     var error = new TypeError(msg);
@@ -879,7 +881,7 @@ function apiRejection(msg) {
 return apiRejection;
 };
 
-},{"./errors.js":9}],11:[function(_dereq_,module,exports){
+},{"./errors.js":10}],12:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -970,7 +972,7 @@ else {
     };
 }
 
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -995,7 +997,7 @@ else {
  */
 "use strict";
 module.exports = function(Promise) {
-var isArray = _dereq_("./util.js").isArray;
+var isArray = require("./util.js").isArray;
 
 function Promise$_filter(booleans) {
     var values = this instanceof Promise ? this._settledValue : this;
@@ -1023,7 +1025,7 @@ Promise.prototype.filter = function Promise$filter(fn) {
 };
 };
 
-},{"./util.js":37}],13:[function(_dereq_,module,exports){
+},{"./util.js":38}],14:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1048,7 +1050,7 @@ Promise.prototype.filter = function Promise$filter(fn) {
  */
 "use strict";
 module.exports = function(Promise, NEXT_FILTER) {
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var wrapsPrimitiveReceiver = util.wrapsPrimitiveReceiver;
 var isPrimitive = util.isPrimitive;
 var thrower = util.thrower;
@@ -1148,7 +1150,7 @@ Promise.prototype.tap = function Promise$tap(handler) {
 };
 };
 
-},{"./util.js":37}],14:[function(_dereq_,module,exports){
+},{"./util.js":38}],15:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1173,10 +1175,10 @@ Promise.prototype.tap = function Promise$tap(handler) {
  */
 "use strict";
 module.exports = function(Promise, apiRejection, INTERNAL) {
-var PromiseSpawn = _dereq_("./promise_spawn.js")(Promise, INTERNAL);
-var errors = _dereq_("./errors.js");
+var PromiseSpawn = require("./promise_spawn.js")(Promise, INTERNAL);
+var errors = require("./errors.js");
 var TypeError = errors.TypeError;
-var deprecated = _dereq_("./util.js").deprecated;
+var deprecated = require("./util.js").deprecated;
 
 Promise.coroutine = function Promise$Coroutine(generatorFunction) {
     if (typeof generatorFunction !== "function") {
@@ -1206,7 +1208,7 @@ Promise.spawn = function Promise$Spawn(generatorFunction) {
 };
 };
 
-},{"./errors.js":9,"./promise_spawn.js":22,"./util.js":37}],15:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./promise_spawn.js":23,"./util.js":38}],16:[function(require,module,exports){
 (function (global){
 /**
  * Copyright (c) 2014 Petka Antonov
@@ -1241,7 +1243,7 @@ module.exports = (function() {
 })();
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(_dereq_,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1268,8 +1270,8 @@ module.exports = (function() {
 module.exports = function(Promise, PromiseArray, INTERNAL, apiRejection) {
 
 var all = Promise.all;
-var util = _dereq_("./util.js");
-var canAttach = _dereq_("./errors.js").canAttach;
+var util = require("./util.js");
+var canAttach = require("./errors.js").canAttach;
 var isArray = util.isArray;
 var _cast = Promise._cast;
 
@@ -1419,7 +1421,7 @@ Promise.map = function Promise$Map(promises, fn, ref) {
 };
 };
 
-},{"./errors.js":9,"./util.js":37}],17:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./util.js":38}],18:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1444,8 +1446,8 @@ Promise.map = function Promise$Map(promises, fn, ref) {
  */
 "use strict";
 module.exports = function(Promise) {
-var util = _dereq_("./util.js");
-var async = _dereq_("./async.js");
+var util = require("./util.js");
+var async = require("./async.js");
 var tryCatch2 = util.tryCatch2;
 var tryCatch1 = util.tryCatch1;
 var errorObj = util.errorObj;
@@ -1485,7 +1487,7 @@ Promise.prototype.nodeify = function Promise$nodeify(nodeback) {
 };
 };
 
-},{"./async.js":2,"./util.js":37}],18:[function(_dereq_,module,exports){
+},{"./async.js":2,"./util.js":38}],19:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -1510,9 +1512,9 @@ Promise.prototype.nodeify = function Promise$nodeify(nodeback) {
  */
 "use strict";
 module.exports = function(Promise, isPromiseArrayProxy) {
-var util = _dereq_("./util.js");
-var async = _dereq_("./async.js");
-var errors = _dereq_("./errors.js");
+var util = require("./util.js");
+var async = require("./async.js");
+var errors = require("./errors.js");
 var tryCatch1 = util.tryCatch1;
 var errorObj = util.errorObj;
 
@@ -1598,7 +1600,7 @@ function Promise$_progressUnchecked(progressValue) {
 };
 };
 
-},{"./async.js":2,"./errors.js":9,"./util.js":37}],19:[function(_dereq_,module,exports){
+},{"./async.js":2,"./errors.js":10,"./util.js":38}],20:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2014 Petka Antonov
@@ -1624,19 +1626,19 @@ function Promise$_progressUnchecked(progressValue) {
  */
 "use strict";
 module.exports = function() {
-var global = _dereq_("./global.js");
-var util = _dereq_("./util.js");
-var async = _dereq_("./async.js");
-var errors = _dereq_("./errors.js");
+var global = require("./global.js");
+var util = require("./util.js");
+var async = require("./async.js");
+var errors = require("./errors.js");
 
 var INTERNAL = function(){};
 var APPLY = {};
 var NEXT_FILTER = {e: null};
 
-var PromiseArray = _dereq_("./promise_array.js")(Promise, INTERNAL);
-var CapturedTrace = _dereq_("./captured_trace.js")();
-var CatchFilter = _dereq_("./catch_filter.js")(NEXT_FILTER);
-var PromiseResolver = _dereq_("./promise_resolver.js");
+var PromiseArray = require("./promise_array.js")(Promise, INTERNAL);
+var CapturedTrace = require("./captured_trace.js")();
+var CatchFilter = require("./catch_filter.js")(NEXT_FILTER);
+var PromiseResolver = require("./promise_resolver.js");
 
 var isArray = util.isArray;
 
@@ -1653,7 +1655,7 @@ var originatesFromRejection = errors.originatesFromRejection;
 var markAsOriginatingFromRejection = errors.markAsOriginatingFromRejection;
 var canAttach = errors.canAttach;
 var thrower = util.thrower;
-var apiRejection = _dereq_("./errors_api_rejection")(Promise);
+var apiRejection = require("./errors_api_rejection")(Promise);
 
 
 var makeSelfResolutionError = function Promise$_makeSelfResolutionError() {
@@ -2700,10 +2702,10 @@ if (!CapturedTrace.isSupported()) {
 }
 
 Promise._makeSelfResolutionError = makeSelfResolutionError;
-_dereq_("./finally.js")(Promise, NEXT_FILTER);
-_dereq_("./direct_resolve.js")(Promise);
-_dereq_("./thenables.js")(Promise, INTERNAL);
-_dereq_("./synchronous_inspection.js")(Promise);
+require("./finally.js")(Promise, NEXT_FILTER);
+require("./direct_resolve.js")(Promise);
+require("./thenables.js")(Promise, INTERNAL);
+require("./synchronous_inspection.js")(Promise);
 Promise.RangeError = RangeError;
 Promise.CancellationError = CancellationError;
 Promise.TimeoutError = TimeoutError;
@@ -2712,29 +2714,29 @@ Promise.RejectionError = RejectionError;
 
 util.toFastProperties(Promise);
 util.toFastProperties(Promise.prototype);
-_dereq_('./timers.js')(Promise,INTERNAL);
-_dereq_('./any.js')(Promise,Promise$_CreatePromiseArray,PromiseArray);
-_dereq_('./race.js')(Promise,INTERNAL);
-_dereq_('./call_get.js')(Promise);
-_dereq_('./filter.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection);
-_dereq_('./generators.js')(Promise,apiRejection,INTERNAL);
-_dereq_('./map.js')(Promise,PromiseArray,INTERNAL,apiRejection);
-_dereq_('./nodeify.js')(Promise);
-_dereq_('./promisify.js')(Promise,INTERNAL);
-_dereq_('./props.js')(Promise,PromiseArray);
-_dereq_('./reduce.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection,INTERNAL);
-_dereq_('./settle.js')(Promise,Promise$_CreatePromiseArray,PromiseArray);
-_dereq_('./some.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection);
-_dereq_('./progress.js')(Promise,isPromiseArrayProxy);
-_dereq_('./cancel.js')(Promise,INTERNAL);
+require('./timers.js')(Promise,INTERNAL);
+require('./any.js')(Promise,Promise$_CreatePromiseArray,PromiseArray);
+require('./race.js')(Promise,INTERNAL);
+require('./call_get.js')(Promise);
+require('./filter.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection);
+require('./generators.js')(Promise,apiRejection,INTERNAL);
+require('./map.js')(Promise,PromiseArray,INTERNAL,apiRejection);
+require('./nodeify.js')(Promise);
+require('./promisify.js')(Promise,INTERNAL);
+require('./props.js')(Promise,PromiseArray);
+require('./reduce.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection,INTERNAL);
+require('./settle.js')(Promise,Promise$_CreatePromiseArray,PromiseArray);
+require('./some.js')(Promise,Promise$_CreatePromiseArray,PromiseArray,apiRejection);
+require('./progress.js')(Promise,isPromiseArrayProxy);
+require('./cancel.js')(Promise,INTERNAL);
 
 Promise.prototype = Promise.prototype;
 return Promise;
 
 };
 
-}).call(this,_dereq_("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./any.js":1,"./async.js":2,"./call_get.js":4,"./cancel.js":5,"./captured_trace.js":6,"./catch_filter.js":7,"./direct_resolve.js":8,"./errors.js":9,"./errors_api_rejection":10,"./filter.js":12,"./finally.js":13,"./generators.js":14,"./global.js":15,"./map.js":16,"./nodeify.js":17,"./progress.js":18,"./promise_array.js":20,"./promise_resolver.js":21,"./promisify.js":23,"./props.js":25,"./race.js":27,"./reduce.js":28,"./settle.js":30,"./some.js":32,"./synchronous_inspection.js":34,"./thenables.js":35,"./timers.js":36,"./util.js":37,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":44}],20:[function(_dereq_,module,exports){
+}).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
+},{"./any.js":1,"./async.js":2,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":47}],21:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2759,9 +2761,9 @@ return Promise;
  */
 "use strict";
 module.exports = function(Promise, INTERNAL) {
-var canAttach = _dereq_("./errors.js").canAttach;
-var util = _dereq_("./util.js");
-var async = _dereq_("./async.js");
+var canAttach = require("./errors.js").canAttach;
+var util = require("./util.js");
+var async = require("./async.js");
 var hasOwn = {}.hasOwnProperty;
 var isArray = util.isArray;
 
@@ -2969,7 +2971,7 @@ function PromiseArray$_promiseRejected(reason, index) {
 return PromiseArray;
 };
 
-},{"./async.js":2,"./errors.js":9,"./util.js":37}],21:[function(_dereq_,module,exports){
+},{"./async.js":2,"./errors.js":10,"./util.js":38}],22:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -2993,14 +2995,14 @@ return PromiseArray;
  * 
  */
 "use strict";
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var maybeWrapAsError = util.maybeWrapAsError;
-var errors = _dereq_("./errors.js");
+var errors = require("./errors.js");
 var TimeoutError = errors.TimeoutError;
 var RejectionError = errors.RejectionError;
-var async = _dereq_("./async.js");
+var async = require("./async.js");
 var haveGetters = util.haveGetters;
-var es5 = _dereq_("./es5.js");
+var es5 = require("./es5.js");
 
 function isUntypedError(obj) {
     return obj instanceof Error &&
@@ -3129,7 +3131,7 @@ function PromiseResolver$_setCarriedStackTrace(trace) {
 
 module.exports = PromiseResolver;
 
-},{"./async.js":2,"./errors.js":9,"./es5.js":11,"./util.js":37}],22:[function(_dereq_,module,exports){
+},{"./async.js":2,"./errors.js":10,"./es5.js":12,"./util.js":38}],23:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3154,9 +3156,9 @@ module.exports = PromiseResolver;
  */
 "use strict";
 module.exports = function(Promise, INTERNAL) {
-var errors = _dereq_("./errors.js");
+var errors = require("./errors.js");
 var TypeError = errors.TypeError;
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var isArray = util.isArray;
 var errorObj = util.errorObj;
 var tryCatch1 = util.tryCatch1;
@@ -3261,7 +3263,7 @@ PromiseSpawn.addYieldHandler = function PromiseSpawn$AddYieldHandler(fn) {
 return PromiseSpawn;
 };
 
-},{"./errors.js":9,"./util.js":37}],23:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./util.js":38}],24:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3287,15 +3289,15 @@ return PromiseSpawn;
 "use strict";
 module.exports = function(Promise, INTERNAL) {
 var THIS = {};
-var util = _dereq_("./util.js");
-var es5 = _dereq_("./es5.js");
-var nodebackForPromise = _dereq_("./promise_resolver.js")
+var util = require("./util.js");
+var es5 = require("./es5.js");
+var nodebackForPromise = require("./promise_resolver.js")
     ._nodebackForPromise;
 var withAppended = util.withAppended;
 var maybeWrapAsError = util.maybeWrapAsError;
 var canEvaluate = util.canEvaluate;
 var deprecated = util.deprecated;
-var TypeError = _dereq_("./errors").TypeError;
+var TypeError = require("./errors").TypeError;
 
 
 var rasyncSuffix = new RegExp("Async" + "$");
@@ -3556,7 +3558,7 @@ Promise.promisifyAll = function Promise$PromisifyAll(target) {
 };
 
 
-},{"./errors":9,"./es5.js":11,"./promise_resolver.js":21,"./util.js":37}],24:[function(_dereq_,module,exports){
+},{"./errors":10,"./es5.js":12,"./promise_resolver.js":22,"./util.js":38}],25:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3581,9 +3583,9 @@ Promise.promisifyAll = function Promise$PromisifyAll(target) {
  */
 "use strict";
 module.exports = function(Promise, PromiseArray) {
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var inherits = util.inherits;
-var es5 = _dereq_("./es5.js");
+var es5 = require("./es5.js");
 
 function PropertiesPromiseArray(obj, boundTo) {
     var keys = es5.keys(obj);
@@ -3635,7 +3637,7 @@ PromiseArray.PropertiesPromiseArray = PropertiesPromiseArray;
 return PropertiesPromiseArray;
 };
 
-},{"./es5.js":11,"./util.js":37}],25:[function(_dereq_,module,exports){
+},{"./es5.js":12,"./util.js":38}],26:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3660,10 +3662,10 @@ return PropertiesPromiseArray;
  */
 "use strict";
 module.exports = function(Promise, PromiseArray) {
-var PropertiesPromiseArray = _dereq_("./properties_promise_array.js")(
+var PropertiesPromiseArray = require("./properties_promise_array.js")(
     Promise, PromiseArray);
-var util = _dereq_("./util.js");
-var apiRejection = _dereq_("./errors_api_rejection")(Promise);
+var util = require("./util.js");
+var apiRejection = require("./errors_api_rejection")(Promise);
 var isObject = util.isObject;
 
 function Promise$_Props(promises, useBound) {
@@ -3701,7 +3703,7 @@ Promise.props = function Promise$Props(promises) {
 };
 };
 
-},{"./errors_api_rejection":10,"./properties_promise_array.js":24,"./util.js":37}],26:[function(_dereq_,module,exports){
+},{"./errors_api_rejection":11,"./properties_promise_array.js":25,"./util.js":38}],27:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3838,7 +3840,7 @@ Queue.prototype._resizeTo = function Queue$_resizeTo(capacity) {
 
 module.exports = Queue;
 
-},{}],27:[function(_dereq_,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -3863,8 +3865,8 @@ module.exports = Queue;
  */
 "use strict";
 module.exports = function(Promise, INTERNAL) {
-var apiRejection = _dereq_("./errors_api_rejection.js")(Promise);
-var isArray = _dereq_("./util.js").isArray;
+var apiRejection = require("./errors_api_rejection.js")(Promise);
+var isArray = require("./util.js").isArray;
 
 var raceLater = function Promise$_raceLater(promise) {
     return promise.then(function(array) {
@@ -3924,7 +3926,7 @@ Promise.prototype.race = function Promise$race() {
 
 };
 
-},{"./errors_api_rejection.js":10,"./util.js":37}],28:[function(_dereq_,module,exports){
+},{"./errors_api_rejection.js":11,"./util.js":38}],29:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4087,7 +4089,7 @@ Promise.prototype.reduce = function Promise$reduce(fn, initialValue) {
 };
 };
 
-},{}],29:[function(_dereq_,module,exports){
+},{}],30:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2014 Petka Antonov
@@ -4112,7 +4114,7 @@ Promise.prototype.reduce = function Promise$reduce(fn, initialValue) {
  * 
  */
 "use strict";
-var global = _dereq_("./global.js");
+var global = require("./global.js");
 var schedule;
 if (typeof process !== "undefined" && process !== null &&
     typeof process.cwd === "function" &&
@@ -4211,8 +4213,8 @@ else {
 
 module.exports = schedule;
 
-}).call(this,_dereq_("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./global.js":15,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":44}],30:[function(_dereq_,module,exports){
+}).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
+},{"./global.js":16,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":47}],31:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4239,7 +4241,7 @@ module.exports = schedule;
 module.exports =
     function(Promise, Promise$_CreatePromiseArray, PromiseArray) {
 
-var SettledPromiseArray = _dereq_("./settled_promise_array.js")(
+var SettledPromiseArray = require("./settled_promise_array.js")(
     Promise, PromiseArray);
 
 function Promise$_Settle(promises, useBound) {
@@ -4261,7 +4263,7 @@ Promise.prototype.settle = function Promise$settle() {
 };
 };
 
-},{"./settled_promise_array.js":31}],31:[function(_dereq_,module,exports){
+},{"./settled_promise_array.js":32}],32:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4287,7 +4289,7 @@ Promise.prototype.settle = function Promise$settle() {
 "use strict";
 module.exports = function(Promise, PromiseArray) {
 var PromiseInspection = Promise.PromiseInspection;
-var util = _dereq_("./util.js");
+var util = require("./util.js");
 var inherits = util.inherits;
 function SettledPromiseArray(values, boundTo) {
     this.constructor$(values, boundTo);
@@ -4323,7 +4325,7 @@ function SettledPromiseArray$_promiseRejected(reason, index) {
 return SettledPromiseArray;
 };
 
-},{"./util.js":37}],32:[function(_dereq_,module,exports){
+},{"./util.js":38}],33:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4350,7 +4352,7 @@ return SettledPromiseArray;
 module.exports =
 function(Promise, Promise$_CreatePromiseArray, PromiseArray, apiRejection) {
 
-var SomePromiseArray = _dereq_("./some_promise_array.js")(PromiseArray);
+var SomePromiseArray = require("./some_promise_array.js")(PromiseArray);
 function Promise$_Some(promises, howMany, useBound) {
     if ((howMany | 0) !== howMany || howMany < 0) {
         return apiRejection("expecting a positive integer");
@@ -4381,7 +4383,7 @@ Promise.prototype.some = function Promise$some(count) {
 
 };
 
-},{"./some_promise_array.js":33}],33:[function(_dereq_,module,exports){
+},{"./some_promise_array.js":34}],34:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4406,8 +4408,8 @@ Promise.prototype.some = function Promise$some(count) {
  */
 "use strict";
 module.exports = function (PromiseArray) {
-var util = _dereq_("./util.js");
-var RangeError = _dereq_("./errors.js").RangeError;
+var util = require("./util.js");
+var RangeError = require("./errors.js").RangeError;
 var inherits = util.inherits;
 var isArray = util.isArray;
 
@@ -4514,7 +4516,7 @@ function SomePromiseArray$_canPossiblyFulfill() {
 return SomePromiseArray;
 };
 
-},{"./errors.js":9,"./util.js":37}],34:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./util.js":38}],35:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4595,7 +4597,7 @@ Promise.prototype.inspect = function Promise$inspect() {
 Promise.PromiseInspection = PromiseInspection;
 };
 
-},{}],35:[function(_dereq_,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4620,8 +4622,8 @@ Promise.PromiseInspection = PromiseInspection;
  */
 "use strict";
 module.exports = function(Promise, INTERNAL) {
-var util = _dereq_("./util.js");
-var canAttach = _dereq_("./errors.js").canAttach;
+var util = require("./util.js");
+var canAttach = require("./errors.js").canAttach;
 var errorObj = util.errorObj;
 var isObject = util.isObject;
 
@@ -4732,7 +4734,7 @@ function Promise$_doThenable(x, then, originalPromise) {
 Promise._cast = Promise$_Cast;
 };
 
-},{"./errors.js":9,"./util.js":37}],36:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./util.js":38}],37:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4756,7 +4758,7 @@ Promise._cast = Promise$_Cast;
  * 
  */
 "use strict";
-var global = _dereq_("./global.js");
+var global = require("./global.js");
 var setTimeout = function(fn, ms) {
     var $_len = arguments.length;var args = new Array($_len - 2); for(var $_i = 2; $_i < $_len; ++$_i) {args[$_i - 2] = arguments[$_i];}
     global.setTimeout(function(){
@@ -4765,9 +4767,9 @@ var setTimeout = function(fn, ms) {
 };
 
 module.exports = function(Promise, INTERNAL) {
-var util = _dereq_("./util.js");
-var errors = _dereq_("./errors.js");
-var apiRejection = _dereq_("./errors_api_rejection")(Promise);
+var util = require("./util.js");
+var errors = require("./errors.js");
+var apiRejection = require("./errors_api_rejection")(Promise);
 var TimeoutError = Promise.TimeoutError;
 
 var afterTimeout = function Promise$_afterTimeout(promise, message, ms) {
@@ -4837,7 +4839,7 @@ Promise.prototype.timeout = function Promise$timeout(ms, message) {
 
 };
 
-},{"./errors.js":9,"./errors_api_rejection":10,"./global.js":15,"./util.js":37}],37:[function(_dereq_,module,exports){
+},{"./errors.js":10,"./errors_api_rejection":11,"./global.js":16,"./util.js":38}],38:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4861,8 +4863,8 @@ Promise.prototype.timeout = function Promise$timeout(ms, message) {
  * 
  */
 "use strict";
-var global = _dereq_("./global.js");
-var es5 = _dereq_("./es5.js");
+var global = require("./global.js");
+var es5 = require("./es5.js");
 var haveGetters = (function(){
     try {
         var o = {};
@@ -5032,24 +5034,23 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":11,"./global.js":15}],38:[function(_dereq_,module,exports){
-var Stash = {};
-Stash.Item = _dereq_('./stash/item');
-Stash.Pool = _dereq_('./stash/pool');
-
+},{"./es5.js":12,"./global.js":16}],"stash":[function(require,module,exports){
+module.exports=require('sFbBrY');
+},{}],"sFbBrY":[function(require,module,exports){
+var Stash = require('./stash_base');
 Stash.Drivers = {
-  Utils: _dereq_('./stash/drivers/utils'),
-  Ephemeral: _dereq_('./stash/drivers/ephemeral'),
-  LocalStorage: _dereq_('./stash/drivers/local_storage')
+  Utils: require('./stash/drivers/utils'),
+  Ephemeral: require('./stash/drivers/ephemeral'),
+  LocalStorage: require('./stash/drivers/local_storage')
 };
 
 module.exports = Stash;
 
-},{"./stash/drivers/ephemeral":39,"./stash/drivers/local_storage":40,"./stash/drivers/utils":41,"./stash/item":42,"./stash/pool":43}],39:[function(_dereq_,module,exports){
+},{"./stash/drivers/ephemeral":41,"./stash/drivers/local_storage":42,"./stash/drivers/utils":43,"./stash_base":46}],41:[function(require,module,exports){
 module.exports = Ephemeral;
 
-var Promise = _dereq_('bluebird');
-var Utils = _dereq_('./utils');
+var Promise = require('bluebird');
+var Utils = require('./utils');
 var cache = {};
 
 function Ephemeral () {}
@@ -5112,11 +5113,11 @@ Ephemeral.prototype._updateLock = function (key, value) {
   return Promise.cast();
 };
 
-},{"./utils":41,"bluebird":3}],40:[function(_dereq_,module,exports){
+},{"./utils":43,"bluebird":"EjIH/G"}],42:[function(require,module,exports){
 module.exports = LocalStorage;
 
-var Promise = _dereq_('bluebird');
-var Utils = _dereq_('./utils');
+var Promise = require('bluebird');
+var Utils = require('./utils');
 
 function LocalStorage (namespace) {
   this.namespace = namespace || 'stash';
@@ -5187,7 +5188,7 @@ LocalStorage.prototype.unlock = function (key) {
   return Promise.cast();
 };
 
-},{"./utils":41,"bluebird":3}],41:[function(_dereq_,module,exports){
+},{"./utils":43,"bluebird":"EjIH/G"}],43:[function(require,module,exports){
 module.exports = {
   assemble: function (value, expiration) {
     if (typeof value === 'function') {
@@ -5211,10 +5212,10 @@ module.exports = {
   }
 };
 
-},{}],42:[function(_dereq_,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = Item;
 
-var Promise = _dereq_('bluebird');
+var Promise = require('bluebird');
 
 function Item(key, pool) {
   this.key = key;
@@ -5407,9 +5408,9 @@ Item.prototype.unlock = function () {
   });
 };
 
-},{"bluebird":3}],43:[function(_dereq_,module,exports){
+},{"bluebird":"EjIH/G"}],45:[function(require,module,exports){
 module.exports = Pool;
-var Promise = _dereq_('bluebird');
+var Promise = require('bluebird');
 
 function Pool(drivers) {
   if (!drivers) {
@@ -5452,7 +5453,14 @@ Pool.prototype.get = function (key) {
 
 return Pool;
 
-},{"bluebird":3}],44:[function(_dereq_,module,exports){
+},{"bluebird":"EjIH/G"}],46:[function(require,module,exports){
+var Stash = {};
+Stash.Item = require('./stash/item');
+Stash.Pool = require('./stash/pool');
+
+module.exports = Stash;
+
+},{"./stash/item":44,"./stash/pool":45}],47:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5514,6 +5522,5 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}]},{},[38])
-(38)
-});
+},{}]},{},["sFbBrY"])
+window.Stash = require('stash')

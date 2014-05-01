@@ -1,7 +1,8 @@
 all: browserify uglify
 
 browserify:
-	browserify -o dist/stash.js -s Stash src/browser.js
+	browserify -o dist/stash.js src/browser.js -r bluebird -r ./src/browser.js:stash
+	echo "\nwindow.Stash = require('stash')" >> dist/stash.js
 
 uglify:
 	uglifyjs dist/stash.js -o dist/stash.min.js --source-map dist/stash.min.js.map
