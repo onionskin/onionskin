@@ -5244,8 +5244,16 @@ Item.prototype._load_ = function () {
   var that = this;
 
   return new Promise(function (resolve) {
-    that.pool.drivers.forEach(function (d) {
-      d.get(that.key).then(resolve);
+    var promises = that.pool.drivers.map(function (d) {
+      return d.get(that.key).then(function (data) {
+        if (data !== null) {
+          resolve(data);
+        }
+      });
+    });
+
+    Promise.all(promises).then(function () {
+      resolve(null);
     });
   });
 };
@@ -5384,11 +5392,18 @@ Item.prototype.isLocked = function () {
 
   var that = this;
   return new Promise(function (resolve) {
-    that.pool.drivers.forEach(function (d) {
-      d.isLocked(that.key).then(function (locked) {
-        that.locked = locked;
-        resolve(locked);
+    var promises = that.pool.drivers.map(function (d) {
+      return d.isLocked(that.key).then(function (locked) {
+        if (locked) {
+          that.locked = locked;
+          resolve(locked);
+        }
       });
+    });
+
+    Promise.all(promises).then(function () {
+      that.locked = that.locked || false;
+      resolve(that.locked);
     });
   });
 };
