@@ -16,6 +16,7 @@
     <img class="pic" alt="user name" src="">
     <b class="name">User Name</b>
   </div>
+  <pre id="log"></pre>
 
   <script src="../dist/stash.js"></script>
   <script>
@@ -31,6 +32,7 @@
   var profile = document.getElementById('profile');
   var pic = profile.querySelector('.pic');
   var name = profile.querySelector('.name');
+  var log = document.getElementById('log');
 
   document.facebook.onsubmit = function (e) {
     e.preventDefault();
@@ -50,8 +52,11 @@
 
   function publicUserData(username) {
     return stash.get(['facebook', username])
-    .catch(function () {
-      console.log(arguments);
+    .then(function (data) {
+      log.innerHTML += this.key.join('/') + ': Loading from cache!\n';
+      return data;
+    }).catch(function () {
+      log.innerHTML += this.key.join('/') + ': Cache not found... requesting!\n';
       return requestUserData(username).then(this.save);
     });
   }
