@@ -3,14 +3,14 @@ var stash = new Stash.Pool();
 var Promise = require('bluebird');
 
 function _isPrime(number) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     setTimeout(function () {
       if (number % 2 === 0 || number % 3 === 0) {
         return resolve(false);
       }
 
       for(var i = 5, m = 4, max = Math.sqrt(number); i <= max; i += m) {
-        if (number % i == 0) {
+        if (number % i === 0) {
           return resolve(false);
         }
         m = 6 - m;
@@ -32,7 +32,9 @@ function isPrime(number) {
 }
 
 (function loop(counter) {
-  if (++counter > 3) return;
+  if (++counter > 3) {
+    return;
+  }
   var start = Date.now();
   isPrime(2147483647).then(function (data) {
     console.log("%s found in %dms", data, Date.now() - start);

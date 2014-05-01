@@ -10,7 +10,6 @@ function _getFacebookData(username) {
       port: 80,
       path: '/' + username
     }, function (res) {
-      var data = '';
       res.on('data', function (chunk) {
         resolve(chunk.toString());
       });
@@ -29,7 +28,9 @@ function getFacebookData(username) {
 }
 
 (function loop(counter) {
-  if (++counter > 3) return;
+  if (++counter > 3) {
+    return;
+  }
   var start = Date.now();
   getFacebookData('tadeuzagallo').then(function (data) {
     console.log("%s found in %dms", data, Date.now() - start);

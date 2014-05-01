@@ -313,11 +313,11 @@
     };
 
     Ephemeral.prototype.lock = function (key) {
-      return this_updateLock(key, 1);
+      return this._updateLock(key, 1);
     };
 
     Ephemeral.prototype.unlock = function (key) {
-      return this_updateLock(key, null);
+      return this._updateLock(key, null);
     };
 
     Ephemeral.prototype.isLocked = function (key) {
@@ -329,7 +329,7 @@
       key = Stash.Drivers.Utils.key('', key) + '_lock';
       cache[key] = value;
       return Promise.cast();
-    }
+    };
 
     return Ephemeral;
   })();
