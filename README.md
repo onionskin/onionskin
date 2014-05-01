@@ -2,6 +2,8 @@
 
 Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it easier to save your data on multiple layers of cache
 
+[Click here](http://rawgit.com/tadeuzagallo/stash.js/master/examples/facebook.html) to see the [Facebook example](https://github.com/tadeuzagallo/stash.js/blob/master/examples/facebook.html) running on [RawGit](http://rawgit.com/)
+
 ## Installation ##
 
 You can either install via [npm](https://www.npmjs.org)
