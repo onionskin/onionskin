@@ -110,7 +110,7 @@
       return this._write_();
     };
 
-    Item.prototype.isMiss = function (callback) {
+    Item.prototype.isMiss = function () {
       var that = this;
 
       var isMissed = function (locked, resolve) {
@@ -313,9 +313,11 @@
     };
 
     Ephemeral.prototype.lock = function (key) {
-      key = Stash.Drivers.Utils.key('', key) + '_lock';
-      cache[key] = 1;
-      return Promise.cast();
+      return this_updateLock(key, 1);
+    };
+
+    Ephemeral.prototype.unlock = function (key) {
+      return this_updateLock(key, null);
     };
 
     Ephemeral.prototype.isLocked = function (key) {
@@ -323,11 +325,11 @@
       return Promise.cast(Boolean(cache[key]));
     };
 
-    Ephemeral.prototype.unlock = function (key) {
+    Ephemeral.prototype._updateLock = function (key, value) {
       key = Stash.Drivers.Utils.key('', key) + '_lock';
-      cache[key] = null;
+      cache[key] = value;
       return Promise.cast();
-    };
+    }
 
     return Ephemeral;
   })();
@@ -471,8 +473,8 @@
 
   Stash.Drivers.Memcached = (function () {
     function Memcached(serverLocations, options) {
-      var memcached = require('memcached');
-      this.client = new memcached(serverLocations, options);
+      var MemcachedLib = require('memcached');
+      this.client = new MemcachedLib(serverLocations, options);
       this._set = Promise.promisify(this.client.set, this.client);
       this._get = Promise.promisify(this.client.get, this.client);
       this._del = Promise.promisify(this.client.del, this.client);
