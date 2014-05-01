@@ -260,16 +260,17 @@
       return JSON.stringify({ value: value, expiration: expiration });
     },
     key: function (namespace, key) {
+      if (!namespace) {
+        namespace = key;
+        key = [];
+      }
       if (key instanceof Array) {
         key.unshift(namespace);
-        return key.filter(String).join('/');
       } else {
-       key = key.toString()
-        .trim()
-        .replace(/^\/+/g, '')
-        .replace(/\/+$/g, '');
-       return namespace + '/' + key;
+        key = (namespace + '/' + key).split('/');
       }
+
+      return key.filter(String).join('/').replace(/\s/g,'');
     }
   };
 
@@ -472,6 +473,99 @@
     };
 
     return Redis;
+  })();
+
+  Stash.Drivers.Memcached = (function () {
+    var memcached = typeof require !== 'undefined' ? require('memcached') : false;
+
+    function Memcached(serverLocations, options) {
+      this.client = new memcached(serverLocations, options);
+      this._set = Promise.promisify(this.client.set, this.client);
+      this._get = Promise.promisify(this.client.get, this.client);
+      this._del = Promise.promisify(this.client.del, this.client);
+      this._incr = Promise.promisify(this.client.incr, this.client);
+      this.flush = Promise.promisify(this.client.flush, this.client);
+    }
+
+    Memcached.available = (function () {
+      try {
+        require.resolve('memcached');
+        return true;
+      } catch (err) {
+        return false;
+      }
+    })();
+
+    Memcached.prototype.put = function (key, value, expiration) {
+      var that = this;
+      value = Stash.Drivers.Utils.assemble(value, expiration);
+      return this._key(key).then(function (key) {
+        that._set(key, value, expiration || 0);
+      });
+    }
+
+    Memcached.prototype.get = function (key) {
+      var that = this;
+
+      return this._key(key).then(function (key) {
+        return that._get(key);
+      }).then(function (data) {
+        return data ? JSON.parse(data) : (data || null);
+      });
+    }
+
+    Memcached.prototype.delete = function (key) {
+      var that = this;
+      return this._key(key).then(function (key) {
+        key = key.replace(/\d+$/, '_ns')
+        return that._incr(key, 1);
+      });
+    };
+
+    Memcached.prototype.isLocked = function (key) {
+      key = Stash.Drivers.Utils.key('', key + '_lock');
+      return this._get(key).then(function (locked) {
+        return Boolean(locked);
+      });
+    };
+
+    Memcached.prototype.lock = function (key) {
+      key = Stash.Drivers.Utils.key('', key + '_lock');
+      return this._set(key, 1, 60);
+    };
+
+    Memcached.prototype.unlock = function (key) {
+      key = Stash.Drivers.Utils.key('', key + '_lock');
+      return this._del(key);
+    };
+
+    Memcached.prototype._key = function (key) {
+      var that = this;
+      key = Stash.Drivers.Utils.key([], key);
+      return Promise.reduce(key.split('/'), function (path, key) {
+        path.push(key);
+        return that._get(path.join('/') + '_ns').then(function (count) {
+          var commit = function (path, key, count) {
+            path.pop();
+            path.push(key + count);
+            return path;
+          };
+
+          if (count == false) {
+            count = Date.now();
+            return that._set(path.join('/') + '_ns', count, 0).then(function () {
+              return commit(path, key, count);
+            });
+          } else {
+              return commit(path, key, count);
+          }
+        });
+      }, []).then(function (key) {
+        return key.join('/');
+      });
+    };
+
+    return Memcached;
   })();
 
   if (isNode) {
