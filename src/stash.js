@@ -411,9 +411,8 @@
   })();
   
   Stash.Drivers.Redis = (function () {
-    var redis = isNode ? require('redis') : false;
-
     function Redis () {
+      var redis = require('redis');
       this.client = redis.createClient.apply(redis, arguments);
       this._get = Promise.promisify(this.client.get, this.client);
       this._set = Promise.promisify(this.client.set, this.client);
@@ -476,9 +475,8 @@
   })();
 
   Stash.Drivers.Memcached = (function () {
-    var memcached = typeof require !== 'undefined' ? require('memcached') : false;
-
     function Memcached(serverLocations, options) {
+      var memcached = require('memcached');
       this.client = new memcached(serverLocations, options);
       this._set = Promise.promisify(this.client.set, this.client);
       this._get = Promise.promisify(this.client.get, this.client);
