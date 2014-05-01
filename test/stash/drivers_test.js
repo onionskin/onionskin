@@ -124,10 +124,6 @@ describe('Stash::Drivers', function () {
         });
 
         context('#lock', function () {
-          it('should return a promise', function () {
-            expect(Promise.is(driver.lock('foo'))).to.be.true;
-          });
-
           it('should lock a key', function (done) {
             var key = Math.random().toString();
             driver.isLocked(key).then(function (locked) {
