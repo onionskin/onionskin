@@ -13,7 +13,7 @@ Stash.Drivers = {
     return require('./stash/drivers/memcached');
   },
   get Redis() {
-    return require('./stash/drivers/redis')
+    return require('./stash/drivers/redis');
   }
 };
 
