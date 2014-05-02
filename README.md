@@ -15,7 +15,7 @@ $ npm install stash.js
 Or via [bower](http://bower.io/)
 
 ```
-$ bower install stash
+$ bower install stash.js
 ```
 
 Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/tadeuzagallo/stash.js/master/src/stash.js) file
