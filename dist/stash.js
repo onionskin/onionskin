@@ -166,9 +166,7 @@ Async.prototype._reset = function Async$_reset() {
 
 module.exports = new Async();
 
-},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"bluebird":[function(require,module,exports){
-module.exports=require('EjIH/G');
-},{}],"EjIH/G":[function(require,module,exports){
+},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"EjIH/G":[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -194,7 +192,9 @@ module.exports=require('EjIH/G');
 "use strict";
 var Promise = require("./promise.js")();
 module.exports = Promise;
-},{"./promise.js":20}],5:[function(require,module,exports){
+},{"./promise.js":20}],"bluebird":[function(require,module,exports){
+module.exports=require('EjIH/G');
+},{}],5:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5449,11 +5449,11 @@ Pool.prototype.flush = function () {
   });
 };
 
-Pool.prototype.get = function (key) {
+Pool.prototype.get = function (key, cachePolicy, policyData) {
   var item = this.getItem(key);
 
   return new Promise(function (resolve, reject) {
-    item.get().then(function (data) {
+    item.get(cachePolicy, policyData).then(function (data) {
       item.isMiss().then(function (missed) {
         if (missed) {
           item.lock();

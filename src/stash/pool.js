@@ -23,11 +23,11 @@ Pool.prototype.flush = function () {
   });
 };
 
-Pool.prototype.get = function (key) {
+Pool.prototype.get = function (key, cachePolicy, policyData) {
   var item = this.getItem(key);
 
   return new Promise(function (resolve, reject) {
-    item.get().then(function (data) {
+    item.get(cachePolicy, policyData).then(function (data) {
       item.isMiss().then(function (missed) {
         if (missed) {
           item.lock();
