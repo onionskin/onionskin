@@ -27,9 +27,9 @@ Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/
 *Syntax Updated:* in order to add new drivers, I had to replace the old sync syntax, the new one is based on promises, and it now depends on [bluebird](https://github.com/petkaantonov/bluebird)
 
 ```javascript
-// By version 1.2 you should require('stash');
+// By version 1.2 you should require('stash.js');
 // It is still available on window, but is deprecated and will be removed on version 2.0
-var Stash = require('stash');
+var Stash = require('stash.js');
 
 // Initialize a stash pool
 var stash = new Stash.Pool();

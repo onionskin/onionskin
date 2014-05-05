@@ -5034,7 +5034,7 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":12,"./global.js":16}],"stash":[function(require,module,exports){
+},{"./es5.js":12,"./global.js":16}],"stash.js":[function(require,module,exports){
 module.exports=require('sFbBrY');
 },{}],"sFbBrY":[function(require,module,exports){
 var Stash = require('./stash_base');
@@ -5538,4 +5538,4 @@ process.chdir = function (dir) {
 };
 
 },{}]},{},["sFbBrY"])
-window.Stash = require('stash')
+window.Stash = require('stash.js')
