@@ -2736,7 +2736,7 @@ return Promise;
 };
 
 }).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./any.js":1,"./async.js":2,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":47}],21:[function(require,module,exports){
+},{"./any.js":1,"./async.js":2,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":48}],21:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4214,7 +4214,7 @@ else {
 module.exports = schedule;
 
 }).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./global.js":16,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":47}],31:[function(require,module,exports){
+},{"./global.js":16,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":48}],31:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5034,19 +5034,20 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":12,"./global.js":16}],"stash.js":[function(require,module,exports){
-module.exports=require('sFbBrY');
-},{}],"sFbBrY":[function(require,module,exports){
+},{"./es5.js":12,"./global.js":16}],"sFbBrY":[function(require,module,exports){
 var Stash = require('./stash_base');
 Stash.Drivers = {
   Utils: require('./stash/drivers/utils'),
   Ephemeral: require('./stash/drivers/ephemeral'),
-  LocalStorage: require('./stash/drivers/local_storage')
+  LocalStorage: require('./stash/drivers/local_storage'),
+  IndexedDB: require('./stash/drivers/indexed_db')
 };
 
 module.exports = Stash;
 
-},{"./stash/drivers/ephemeral":41,"./stash/drivers/local_storage":42,"./stash/drivers/utils":43,"./stash_base":46}],41:[function(require,module,exports){
+},{"./stash/drivers/ephemeral":41,"./stash/drivers/indexed_db":42,"./stash/drivers/local_storage":43,"./stash/drivers/utils":44,"./stash_base":47}],"stash.js":[function(require,module,exports){
+module.exports=require('sFbBrY');
+},{}],41:[function(require,module,exports){
 module.exports = Ephemeral;
 
 var Promise = require('bluebird');
@@ -5113,7 +5114,26 @@ Ephemeral.prototype._updateLock = function (key, value) {
   return Promise.cast();
 };
 
-},{"./utils":43,"bluebird":"EjIH/G"}],42:[function(require,module,exports){
+},{"./utils":44,"bluebird":"EjIH/G"}],42:[function(require,module,exports){
+var Promise = require('bluebird');
+module.exports = IndexedDB;
+
+function IndexedDB () {
+  this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+  this.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+  this.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+}
+
+IndexedDB.available = (function () {
+  return typeof window !== 'undefined' && (
+    'indexedDB' in window ||
+    'mozIndexedDB' in window ||
+    'webkitIndexedDB' in window ||
+    'msIndexedDB' in window
+  );
+})();
+
+},{"bluebird":"EjIH/G"}],43:[function(require,module,exports){
 module.exports = LocalStorage;
 
 var Promise = require('bluebird');
@@ -5187,7 +5207,7 @@ LocalStorage.prototype.unlock = function (key) {
   return Promise.cast();
 };
 
-},{"./utils":43,"bluebird":"EjIH/G"}],43:[function(require,module,exports){
+},{"./utils":44,"bluebird":"EjIH/G"}],44:[function(require,module,exports){
 module.exports = {
   assemble: function (value, expiration) {
     if (typeof value === 'function') {
@@ -5211,7 +5231,7 @@ module.exports = {
   }
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 module.exports = Item;
 
 var Promise = require('bluebird');
@@ -5423,7 +5443,7 @@ Item.prototype.unlock = function () {
   });
 };
 
-},{"bluebird":"EjIH/G"}],45:[function(require,module,exports){
+},{"bluebird":"EjIH/G"}],46:[function(require,module,exports){
 module.exports = Pool;
 var Promise = require('bluebird');
 
@@ -5468,14 +5488,14 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
 
 return Pool;
 
-},{"bluebird":"EjIH/G"}],46:[function(require,module,exports){
+},{"bluebird":"EjIH/G"}],47:[function(require,module,exports){
 var Stash = {};
 Stash.Item = require('./stash/item');
 Stash.Pool = require('./stash/pool');
 
 module.exports = Stash;
 
-},{"./stash/item":44,"./stash/pool":45}],47:[function(require,module,exports){
+},{"./stash/item":45,"./stash/pool":46}],48:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
