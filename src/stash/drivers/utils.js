@@ -1,10 +1,16 @@
 module.exports = {
-  assemble: function (value, expiration) {
+  assemble: function (value, expiration, key) {
     if (typeof value === 'function') {
       throw new TypeError('Only serializables values can be cached');
     }
 
-    return JSON.stringify({ value: value, expiration: expiration });
+    var obj = { value: value, expiration: expiration };
+    
+    if (key) {
+      obj.key = key;
+    }
+
+    return JSON.stringify(obj);
   },
   key: function (namespace, key) {
     if (!namespace) {
