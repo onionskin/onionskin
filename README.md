@@ -66,6 +66,7 @@ You can run the node.js samples on the `examples` folder to see a really basic d
 ```javascript
 var ephemeral = new Stash.Drivers.Ephemeral();
 var localStorage = new Stash.Drivers.LocalStorage('my-custom-namespace');
+var indexedDB = new Stash.Drivers.IndexedDB('my-custom-dbname');
 
 // Config info available below
 var redis = new Stash.Drivers.Redis(); 
@@ -77,10 +78,11 @@ var serverPool = new Stash.Pool([ephemeral, memcached, redis]);
 
 ### Drivers ###
 
-Right now there are four drivers
+Right now there are five drivers
 
 * Ephemeral - runtime only
-* LocalStorage - saves on browser localStorage
+* LocalStorage([string namespace]) - saves on browser localStorage - accepts a namespace as optional parameter
+* IndexedDB([string db_name]) - saves on browser indexed database - accepts a database name as optional parameter
 * Memcached - uses [node-memcached](https://github.com/3rd-Eden/node-memcached), the constructor accpets `serverLocations` and `options`, that are passed to the `node-memcached` constructor, info about configuration available [here](https://github.com/3rd-Eden/node-memcached#server-locations)
 * Redis - uses [node-redis](https://github.com/mranney/node_redis/) to store cache on redis, All parameters passed to the constructor will be passed to `redis.createClient()`
 
