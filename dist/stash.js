@@ -5034,7 +5034,9 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":12,"./global.js":16}],"sFbBrY":[function(require,module,exports){
+},{"./es5.js":12,"./global.js":16}],"stash.js":[function(require,module,exports){
+module.exports=require('sFbBrY');
+},{}],"sFbBrY":[function(require,module,exports){
 var Stash = require('./stash_base');
 Stash.Drivers = {
   Utils: require('./stash/drivers/utils'),
@@ -5045,9 +5047,7 @@ Stash.Drivers = {
 
 module.exports = Stash;
 
-},{"./stash/drivers/ephemeral":41,"./stash/drivers/indexed_db":42,"./stash/drivers/local_storage":43,"./stash/drivers/utils":44,"./stash_base":47}],"stash.js":[function(require,module,exports){
-module.exports=require('sFbBrY');
-},{}],41:[function(require,module,exports){
+},{"./stash/drivers/ephemeral":41,"./stash/drivers/indexed_db":42,"./stash/drivers/local_storage":43,"./stash/drivers/utils":44,"./stash_base":47}],41:[function(require,module,exports){
 module.exports = Ephemeral;
 
 var Promise = require('bluebird');
@@ -5149,7 +5149,7 @@ function IndexedDB(namespace) {
       var objectStore = db.createObjectStore('cache', { keyPath:  'key' });
       objectStore.createIndex('key', 'key', { unique: true });
     };
-  });
+  }).bind(this);
 }
 
 IndexedDB.available = (function () {
@@ -5162,9 +5162,11 @@ IndexedDB.available = (function () {
 })();
 
 IndexedDB.prototype.put = function (key, value, expiration) {
-  key = Utils.key(this.namespace, key);
   value = Utils.assemble(value, expiration, key, false);
-  return this._put(value);
+  return this._key(key).then(function (k) {
+    value.key = k;
+    return this._put(value);
+  });
 };
 
 IndexedDB.prototype._put = function (value) {
@@ -5182,8 +5184,7 @@ IndexedDB.prototype._put = function (value) {
 };
 
 IndexedDB.prototype.get = function (key) {
-  key = Utils.key(this.namespace, key);
-  return this._get(key).then(function (value) {
+  return this._key(key).then(this._get).then(function (value) {
     if (value) {
       delete value.key;
     }
@@ -5207,8 +5208,7 @@ IndexedDB.prototype._get = function (key) {
 };
 
 IndexedDB.prototype.delete = function (key) {
-  key = Utils.key(this.namespace, key);
-  return this._delete(key);
+  return this._key(key).then(this._delete);
 };
 
 IndexedDB.prototype._delete = function (key) {
@@ -5228,18 +5228,17 @@ IndexedDB.prototype._delete = function (key) {
 };
 
 IndexedDB.prototype.isLocked = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._get(key).then(function (value) {
+  return this._key(key+'_lock').then(this._get).then(function (value) {
     return Boolean(value);
   });
 };
 IndexedDB.prototype.lock = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._put({ key: key, value: 1 });
+  return this._key(key+'_lock').then(function (k) {
+    return this._put({ key: k, value: 1 });
+  });
 };
 IndexedDB.prototype.unlock = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._delete(key);
+  return this._key(key+'_lock').then(this._delete);
 };
 
 IndexedDB.prototype.flush = function () {
@@ -5255,6 +5254,11 @@ IndexedDB.prototype.flush = function () {
       };
     });
   });
+};
+
+IndexedDB.prototype._key = function (key) {
+  key = Utils.key(this.namespace, key);
+  return Promise.cast(key).bind(this);
 };
 
 },{"./utils":44,"bluebird":"EjIH/G"}],43:[function(require,module,exports){

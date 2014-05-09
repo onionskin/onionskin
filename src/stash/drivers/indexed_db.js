@@ -32,7 +32,7 @@ function IndexedDB(namespace) {
       var objectStore = db.createObjectStore('cache', { keyPath:  'key' });
       objectStore.createIndex('key', 'key', { unique: true });
     };
-  });
+  }).bind(this);
 }
 
 IndexedDB.available = (function () {
@@ -45,9 +45,11 @@ IndexedDB.available = (function () {
 })();
 
 IndexedDB.prototype.put = function (key, value, expiration) {
-  key = Utils.key(this.namespace, key);
   value = Utils.assemble(value, expiration, key, false);
-  return this._put(value);
+  return this._key(key).then(function (k) {
+    value.key = k;
+    return this._put(value);
+  });
 };
 
 IndexedDB.prototype._put = function (value) {
@@ -65,8 +67,7 @@ IndexedDB.prototype._put = function (value) {
 };
 
 IndexedDB.prototype.get = function (key) {
-  key = Utils.key(this.namespace, key);
-  return this._get(key).then(function (value) {
+  return this._key(key).then(this._get).then(function (value) {
     if (value) {
       delete value.key;
     }
@@ -90,8 +91,7 @@ IndexedDB.prototype._get = function (key) {
 };
 
 IndexedDB.prototype.delete = function (key) {
-  key = Utils.key(this.namespace, key);
-  return this._delete(key);
+  return this._key(key).then(this._delete);
 };
 
 IndexedDB.prototype._delete = function (key) {
@@ -111,18 +111,17 @@ IndexedDB.prototype._delete = function (key) {
 };
 
 IndexedDB.prototype.isLocked = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._get(key).then(function (value) {
+  return this._key(key+'_lock').then(this._get).then(function (value) {
     return Boolean(value);
   });
 };
 IndexedDB.prototype.lock = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._put({ key: key, value: 1 });
+  return this._key(key+'_lock').then(function (k) {
+    return this._put({ key: k, value: 1 });
+  });
 };
 IndexedDB.prototype.unlock = function (key) {
-  key = Utils.key(this.namespace, key + '_lock');
-  return this._delete(key);
+  return this._key(key+'_lock').then(this._delete);
 };
 
 IndexedDB.prototype.flush = function () {
@@ -138,4 +137,9 @@ IndexedDB.prototype.flush = function () {
       };
     });
   });
+};
+
+IndexedDB.prototype._key = function (key) {
+  key = Utils.key(this.namespace, key);
+  return Promise.cast(key).bind(this);
 };

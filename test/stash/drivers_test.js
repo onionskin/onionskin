@@ -74,14 +74,10 @@ describe('Stash::Drivers', function () {
           it('should delete a key', function (done) {
             driver.put('foo', 'bar', 0)
             .then(function () {
-              try {
-                return driver.delete('foo');
-              } catch (err) { done(err) }
+              return driver.delete('foo');
             })
             .then(function () {
-              try {
-                return driver.get('foo');
-              } catch (err) { done(err) }
+              return driver.get('foo');
             })
             .then(function (data) {
               catching(done, function () {
