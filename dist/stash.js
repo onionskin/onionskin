@@ -5034,9 +5034,7 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":12,"./global.js":16}],"stash.js":[function(require,module,exports){
-module.exports=require('sFbBrY');
-},{}],"sFbBrY":[function(require,module,exports){
+},{"./es5.js":12,"./global.js":16}],"sFbBrY":[function(require,module,exports){
 var Stash = require('./stash_base');
 Stash.Drivers = {
   Utils: require('./stash/drivers/utils'),
@@ -5047,7 +5045,9 @@ Stash.Drivers = {
 
 module.exports = Stash;
 
-},{"./stash/drivers/ephemeral":41,"./stash/drivers/indexed_db":42,"./stash/drivers/local_storage":43,"./stash/drivers/utils":44,"./stash_base":47}],41:[function(require,module,exports){
+},{"./stash/drivers/ephemeral":41,"./stash/drivers/indexed_db":42,"./stash/drivers/local_storage":43,"./stash/drivers/utils":44,"./stash_base":47}],"stash.js":[function(require,module,exports){
+module.exports=require('sFbBrY');
+},{}],41:[function(require,module,exports){
 module.exports = Ephemeral;
 
 var Promise = require('bluebird');
@@ -5116,11 +5116,12 @@ Ephemeral.prototype._updateLock = function (key, value) {
 
 },{"./utils":44,"bluebird":"EjIH/G"}],42:[function(require,module,exports){
 var Promise = require('bluebird');
+Promise.longStackTraces();
 var Utils = require('./utils');
 
 module.exports = IndexedDB;
 
-function IndexedDB (namespace) {
+function IndexedDB(namespace) {
   this.namespace = namespace || 'stash';
 
   this.indexedDB = window.indexedDB ||
@@ -5137,7 +5138,9 @@ function IndexedDB (namespace) {
   var that = this;
   this.db = new Promise(function (resolve, reject) {
     var request = that.indexedDB.open('stash_db');
-    request.onerror = reject;
+    request.onerror = function (event) {
+      reject(event.target.error);
+    };
     request.onsuccess = function () {
       resolve(request.result);
     };
@@ -5161,32 +5164,82 @@ IndexedDB.available = (function () {
 IndexedDB.prototype.put = function (key, value, expiration) {
   key = Utils.key(this.namespace, key);
   value = Utils.assemble(value, expiration, key, false);
+  return this._put(value);
+};
+
+IndexedDB.prototype._put = function (value) {
   return this.db.then(function (db) {
     return new Promise(function (resolve, reject) {
       var transaction = db.transaction('cache', 'readwrite');
       var store = transaction.objectStore('cache');
-      transaction.onerror = reject;
+      transaction.onerror = function (err) {
+        reject(err.target.error);
+      };
       transaction.oncomplete = resolve;
-      store.add(value);
+      store.put(value);
     });
   });
 };
 
 IndexedDB.prototype.get = function (key) {
   key = Utils.key(this.namespace, key);
+  return this._get(key).then(function (value) {
+    if (value) {
+      delete value.key;
+    }
+    return value;
+  });
+};
+
+IndexedDB.prototype._get = function (key) {
   return this.db.then(function (db) {
     var store = db.transaction('cache').objectStore('cache');
     var request = store.get(key);
     return new Promise(function (resolve, reject) {
-      request.onerror = reject;
+      request.onerror = function (err) {
+        reject(err.target.error);
+      };
       request.onsuccess = function () {
-        if (request.result) {
-          delete request.result.key;
-        }
         resolve(request.result || null);
       };
     });
   });
+};
+
+IndexedDB.prototype.delete = function (key) {
+  key = Utils.key(this.namespace, key);
+  return this._delete(key);
+};
+
+IndexedDB.prototype._delete = function (key) {
+  return this.db.then(function (db) {
+    return new Promise(function (resolve, reject) {
+      var transaction = db.transaction('cache', 'readwrite');
+      var store = transaction.objectStore('cache');
+      transaction.oncomplete = function () {
+        resolve();
+      };
+      transaction.onerror = function (err) {
+        reject(err.target.error);
+      };
+      var request = store.delete(key);
+    });
+  });
+};
+
+IndexedDB.prototype.isLocked = function (key) {
+  key = Utils.key(this.namespace, key + '_lock');
+  return this._get(key).then(function (value) {
+    return Boolean(value);
+  });
+};
+IndexedDB.prototype.lock = function (key) {
+  key = Utils.key(this.namespace, key + '_lock');
+  return this._put({ key: key, value: 1 });
+};
+IndexedDB.prototype.unlock = function (key) {
+  key = Utils.key(this.namespace, key + '_lock');
+  return this._delete(key);
 };
 
 IndexedDB.prototype.flush = function () {
@@ -5194,8 +5247,12 @@ IndexedDB.prototype.flush = function () {
     return new Promise(function (resolve, reject) {
       var store = db.transaction('cache', 'readwrite').objectStore('cache');
       var request = store.clear();
-      request.onerror = reject;
-      request.onsuccess = resolve;
+      request.onerror = function (err) {
+        reject(err.target.error);
+      };
+      request.onsuccess = function () {
+        resolve(request.result);
+      };
     });
   });
 };

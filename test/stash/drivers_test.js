@@ -56,8 +56,9 @@ describe('Stash::Drivers', function () {
               return driver.get('foo');
             })
             .then(function (data) {
+              catching(done, function () {
                 expect(data).to.be.deep.equal({ value: 'bar', expiration: 0 });
-                done();
+              });
             });
           });
 
@@ -73,10 +74,14 @@ describe('Stash::Drivers', function () {
           it('should delete a key', function (done) {
             driver.put('foo', 'bar', 0)
             .then(function () {
-              return driver.delete('foo');
+              try {
+                return driver.delete('foo');
+              } catch (err) { done(err) }
             })
             .then(function () {
-              return driver.get('foo');
+              try {
+                return driver.get('foo');
+              } catch (err) { done(err) }
             })
             .then(function (data) {
               catching(done, function () {
