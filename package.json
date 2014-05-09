@@ -1,6 +1,6 @@
 {
   "name": "stash.js",
-  "version": "1.1.3",
+  "version": "1.2.3",
   "description": "Multilayer Cache Manager for JavaScript",
   "main": "src/stash.js",
   "scripts": {
