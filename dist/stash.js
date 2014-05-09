@@ -166,7 +166,9 @@ Async.prototype._reset = function Async$_reset() {
 
 module.exports = new Async();
 
-},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"EjIH/G":[function(require,module,exports){
+},{"./global.js":16,"./queue.js":27,"./schedule.js":30,"./util.js":38}],"bluebird":[function(require,module,exports){
+module.exports=require('EjIH/G');
+},{}],"EjIH/G":[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -192,9 +194,7 @@ module.exports = new Async();
 "use strict";
 var Promise = require("./promise.js")();
 module.exports = Promise;
-},{"./promise.js":20}],"bluebird":[function(require,module,exports){
-module.exports=require('EjIH/G');
-},{}],5:[function(require,module,exports){
+},{"./promise.js":20}],5:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5137,7 +5137,7 @@ function IndexedDB(namespace) {
 
   var that = this;
   this.db = new Promise(function (resolve, reject) {
-    var request = that.indexedDB.open('stash_db');
+    var request = that.indexedDB.open(that.namespace);
     request.onerror = function (event) {
       reject(event.target.error);
     };
@@ -5208,7 +5208,39 @@ IndexedDB.prototype._get = function (key) {
 };
 
 IndexedDB.prototype.delete = function (key) {
-  return this._key(key).then(this._delete);
+  return this._key(key).then(function (k) {
+    return this.db.then(function (db) {
+      var transaction = db.transaction('cache', 'readwrite');
+      var store = transaction.objectStore('cache');
+      var index = store.index('key');
+      var keyRange = this.IDBKeyRange.lowerBound(k);
+
+      return new Promise(function (resolve, reject) {
+        var cursor = index.openKeyCursor(keyRange);
+        var queue = [];
+
+        cursor.onerror = function (event) {
+          reject(event.target.error);
+        };
+        cursor.onsuccess = function (event) {
+          var cursor = event.target.result;
+          if (cursor) {
+            if (cursor.key.substr(0, k.length) === k) {
+              queue.push(new Promise(function (resolve, reject) {
+                var request = store.delete(cursor.key);
+              }));
+            }
+            cursor.continue();
+          }
+        };
+
+        transaction.onerror = function (event) {
+          reject(event.target.error);
+        };
+        transaction.oncomplete = resolve;
+      });
+    });
+  });
 };
 
 IndexedDB.prototype._delete = function (key) {
