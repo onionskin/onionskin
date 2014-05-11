@@ -9,6 +9,17 @@ describe('Stash::Pool', function () {
     expect(pool.drivers).to.be.an('array');
   });
 
+  it.only('should filter out unavailable drivers', function () {
+    function A(){}
+    function B(){}
+    A.available = false;
+    B.available = true;
+    var d1 = new A();
+    var d2 = new B();
+    var pool = new Stash.Pool([d1, d2]);
+    expect(pool.drivers).to.be.deep.equal([d2]);
+  });
+
   context('#drivers', function () {
     it('should have a default driver', function () {
       expect(pool.drivers.length).to.be.equal(1);

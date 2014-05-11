@@ -3,12 +3,14 @@ var Promise = require('bluebird');
 
 function Pool(drivers) {
   if (!drivers) {
-    this.drivers = [new Stash.Drivers.Ephemeral()];
+    drivers = [new Stash.Drivers.Ephemeral()];
   } else if (Object.prototype.toString.call(drivers) !== '[object Array]') {
-    this.drivers = [drivers];
-  } else {
-    this.drivers = drivers;
+    drivers = [drivers];
   }
+
+  this.drivers = drivers.filter(function (d) {
+    return d.constructor.available;
+  });
 }
 
 Pool.prototype.getItem = function (key) {
