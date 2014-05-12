@@ -98,5 +98,5 @@ Follow this steps and I will be really glad to merge your work and add you to th
 ## Contributors ##
 
 This project was created by [@tadeuzagallo](http://twitter.com/tadeuzagallo) inspired by a PHP library
-named [Stash](http://stash.tedivm.com).
+named [Stash](http://stash.tedivm.com) and was originally Stash.js.
 If you want to join just follow the [instructions](#want-to-help), any help will be very welcome.
