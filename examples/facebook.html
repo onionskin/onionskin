@@ -23,7 +23,7 @@
 (function () {
   var OnionSkin = require('onionskin');
   var Promise = require('bluebird');
-  var pool = new OnionSkin.Pool([
+  var pool = new OnionSkin([
     new OnionSkin.Drivers.Ephemeral(),
     new OnionSkin.Drivers.LocalStorage()
   ]);

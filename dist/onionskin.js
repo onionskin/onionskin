@@ -5662,7 +5662,11 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
 module.exports = Pool;
 
 },{"./drivers/ephemeral":41,"./item":45,"bluebird":"EjIH/G"}],47:[function(require,module,exports){
-var OnionSkin = {};
+var OnionSkin = function (drivers) {
+  'use strict';
+  return new OnionSkin.Pool(drivers);
+};
+
 OnionSkin.Item = require('./onionskin/item');
 OnionSkin.Pool = require('./onionskin/pool');
 

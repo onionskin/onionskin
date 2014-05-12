@@ -1,5 +1,5 @@
 var OnionSkin = require('../src/onionskin');
-var pool = new OnionSkin.Pool();
+var pool = new OnionSkin();
 var Promise = require('bluebird');
 
 function _isPrime(number) {
