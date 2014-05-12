@@ -5615,10 +5615,12 @@ module.exports = Item;
 
 },{"bluebird":"EjIH/G"}],46:[function(require,module,exports){
 var Promise = require('bluebird');
+var Ephemeral = require('./drivers/ephemeral');
+var Item = require('./item');
 
 function Pool(drivers) {
   if (!drivers) {
-    drivers = [new OnionSkin.Drivers.Ephemeral()];
+    drivers = [new Ephemeral()];
   } else if (Object.prototype.toString.call(drivers) !== '[object Array]') {
     drivers = [drivers];
   }
@@ -5629,7 +5631,7 @@ function Pool(drivers) {
 }
 
 Pool.prototype.getItem = function (key) {
-  var item = new OnionSkin.Item(key, this);
+  var item = new Item(key, this);
 
   return item;
 };
@@ -5659,7 +5661,7 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
 
 module.exports = Pool;
 
-},{"bluebird":"EjIH/G"}],47:[function(require,module,exports){
+},{"./drivers/ephemeral":41,"./item":45,"bluebird":"EjIH/G"}],47:[function(require,module,exports){
 var OnionSkin = {};
 OnionSkin.Item = require('./onionskin/item');
 OnionSkin.Pool = require('./onionskin/pool');

@@ -1,8 +1,10 @@
 var Promise = require('bluebird');
+var Ephemeral = require('./drivers/ephemeral');
+var Item = require('./item');
 
 function Pool(drivers) {
   if (!drivers) {
-    drivers = [new OnionSkin.Drivers.Ephemeral()];
+    drivers = [new Ephemeral()];
   } else if (Object.prototype.toString.call(drivers) !== '[object Array]') {
     drivers = [drivers];
   }
@@ -13,7 +15,7 @@ function Pool(drivers) {
 }
 
 Pool.prototype.getItem = function (key) {
-  var item = new OnionSkin.Item(key, this);
+  var item = new Item(key, this);
 
   return item;
 };
