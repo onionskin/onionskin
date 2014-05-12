@@ -1,5 +1,5 @@
-var Stash = require('../src/stash');
-var stash = new Stash.Pool();
+var OnionSkin = require('../src/onionskin');
+var pool = new OnionSkin.Pool();
 var Promise = require('bluebird');
 var http = require('http');
 
@@ -21,7 +21,7 @@ function _getFacebookData(username) {
 
 // Short version 
 function getFacebookData(username) {
-  return stash.get('facebook/user/' + username).catch(function (err){
+  return pool.get('facebook/user/' + username).catch(function (err){
     console.log(err);
     return _getFacebookData(username).then(this.save);
   });

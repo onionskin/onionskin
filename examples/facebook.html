@@ -1,10 +1,10 @@
 <html>
 <head>
-  <title>Stash.js Facebook example</title>
+  <title>OnionSkin Facebook example</title>
 </head>
 <body>
-<h1>Stash.js client side usage example</h1>
-  <h3>Consuming Facebook API &nbsp; <a href="https://github.com/tadeuzagallo/stash.js/blob/master/examples/facebook.html">[source code]</a></h3>
+<h1>OnionSkin client side usage example</h1>
+  <h3>Consuming Facebook API &nbsp; <a href="https://github.com/onionskin/onionskin/blob/master/examples/facebook.html">[source code]</a></h3>
   <form name="facebook" action="#">
     <input type="text" name="username" size="40" placeholder="Facebook username">
     <input type="submit" value="fecth">
@@ -18,14 +18,14 @@
   </div>
   <pre id="log"></pre>
 
-  <script src="../dist/stash.js"></script>
+  <script src="../dist/onionskin.js"></script>
   <script>
 (function () {
-  var Stash = require('stash.js');
+  var OnionSkin = require('onionskin');
   var Promise = require('bluebird');
-  var stash = new Stash.Pool([
-    new Stash.Drivers.Ephemeral(),
-    new Stash.Drivers.LocalStorage()
+  var pool = new OnionSkin.Pool([
+    new OnionSkin.Drivers.Ephemeral(),
+    new OnionSkin.Drivers.LocalStorage()
   ]);
 
   var loader = document.getElementById('loader');
@@ -51,7 +51,7 @@
   };
 
   function publicUserData(username) {
-    return stash.get(['facebook', username])
+    return pool.get(['facebook', username])
     .then(function (data) {
       log.innerHTML += this.key.join('/') + ': Loading from cache!\n';
       return data;

@@ -1,5 +1,5 @@
-var Stash = require('../src/stash');
-var stash = new Stash.Pool();
+var OnionSkin = require('../src/onionskin');
+var pool = new OnionSkin.Pool();
 var Promise = require('bluebird');
 
 function _isPrime(number) {
@@ -22,7 +22,7 @@ function _isPrime(number) {
 }
 
 function isPrime(number) {
-  return stash.get('log2').catch(function (err) {
+  return pool.get('log2').catch(function (err) {
     console.log(err);
     return _isPrime(number).then(function (data) {
       this.set(data);
