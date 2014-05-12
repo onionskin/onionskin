@@ -1,25 +1,25 @@
-describe('Stash::Drivers::Utils', function () {
-  var utils = Stash.Drivers.Utils;
+describe('OnionSkin::Drivers::Utils', function () {
+  var utils = OnionSkin.Drivers.Utils;
 
   it('should be an object', function () {
-    expect(Stash.Drivers.Utils).to.be.an.object;
+    expect(OnionSkin.Drivers.Utils).to.be.an.object;
   });
 
   context('#assemble', function () {
     it('should not raise an exception for objects', function () {
       expect(function () {
-        Stash.Drivers.Utils.assemble({}, 0);
+        OnionSkin.Drivers.Utils.assemble({}, 0);
       }).not.to.throw;
     });
 
     it('should throw for functions', function () {
       expect(function () {
-        Stash.Drivers.Utils.assemble(function () {}, 0);
+        OnionSkin.Drivers.Utils.assemble(function () {}, 0);
       }).to.throw;
     });
 
     it('should return an object with value and expiration', function () {
-      expect(Stash.Drivers.Utils.assemble('foo', 0))
+      expect(OnionSkin.Drivers.Utils.assemble('foo', 0))
         .to.be.equal(JSON.stringify({
           value: 'foo',
           expiration: 0

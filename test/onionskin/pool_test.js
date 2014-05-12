@@ -1,22 +1,22 @@
-describe('Stash::Pool', function () {
-  var pool = new Stash.Pool();
+describe('OnionSkin::Pool', function () {
+  var pool = new OnionSkin.Pool();
 
   it('should create a new Pool', function () {
-    expect(pool).to.be.an.instanceof(Stash.Pool);
+    expect(pool).to.be.an.instanceof(OnionSkin.Pool);
   });
 
   it('should use contain a set of Drivers', function () {
     expect(pool.drivers).to.be.an('array');
   });
 
-  it.only('should filter out unavailable drivers', function () {
+  it('should filter out unavailable drivers', function () {
     function A(){}
     function B(){}
     A.available = false;
     B.available = true;
     var d1 = new A();
     var d2 = new B();
-    var pool = new Stash.Pool([d1, d2]);
+    var pool = new OnionSkin.Pool([d1, d2]);
     expect(pool.drivers).to.be.deep.equal([d2]);
   });
 
@@ -27,8 +27,8 @@ describe('Stash::Pool', function () {
   });
 
   context('#getItem', function() {
-    it('should return instance of Stash.Item', function () {
-      expect(pool.getItem('products/1')).to.be.an.instanceof(Stash.Item);
+    it('should return instance of OnionSkin.Item', function () {
+      expect(pool.getItem('products/1')).to.be.an.instanceof(OnionSkin.Item);
     });
   });
 

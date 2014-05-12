@@ -1,9 +1,8 @@
-module.exports = Pool;
 var Promise = require('bluebird');
 
 function Pool(drivers) {
   if (!drivers) {
-    drivers = [new Stash.Drivers.Ephemeral()];
+    drivers = [new OnionSkin.Drivers.Ephemeral()];
   } else if (Object.prototype.toString.call(drivers) !== '[object Array]') {
     drivers = [drivers];
   }
@@ -14,7 +13,7 @@ function Pool(drivers) {
 }
 
 Pool.prototype.getItem = function (key) {
-  var item = new Stash.Item(key, this);
+  var item = new OnionSkin.Item(key, this);
 
   return item;
 };
@@ -42,4 +41,4 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
   }).bind(item);
 };
 
-return Pool;
+module.exports = Pool;

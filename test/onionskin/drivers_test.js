@@ -1,16 +1,16 @@
-describe('Stash::Drivers', function () {
+describe('OnionSkin::Drivers', function () {
   it('should expose namespace Drivers', function () {
-    expect(Stash.Drivers).to.be.a('object');
+    expect(OnionSkin.Drivers).to.be.a('object');
   });
 
-  for (var driverName in Stash.Drivers) {
+  for (var driverName in OnionSkin.Drivers) {
     if (driverName === 'Utils') {
       continue;
     }
 
     (function (driverName) {
       context('::' + driverName, function () {
-        var Driver = Stash.Drivers[driverName];
+        var Driver = OnionSkin.Drivers[driverName];
 
         it('should contain an ' + driverName + ' driver', function () {
           expect(Driver).to.be.an('function');

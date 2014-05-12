@@ -20,11 +20,11 @@ global.localStorage = (function () {
   }
 })();
 
-var chai = require('chai'),
-    Stash = require('../src/stash');
+var chai = require('chai');
+var OnionSkin = require('../src/onionskin');
 
 global.Promise = require('bluebird');
-global.Stash = Stash;
+global.OnionSkin = OnionSkin;
 global.chai = chai;
 global.expect = chai.expect;
 global.catching = function (done, fn) {
@@ -35,6 +35,5 @@ global.catching = function (done, fn) {
     done(err);
   }
 };
-
 
 chai.should();

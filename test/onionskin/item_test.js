@@ -1,24 +1,24 @@
-describe('Stash::Item', function () {
-  var pool = new Stash.Pool();
+describe('OnionSkin::Item', function () {
+  var pool = new OnionSkin.Pool();
   var driver = pool.drivers[0];
   var foo = pool.getItem('foo');
 
   context('#_calculateExpiration_', function () {
     it('should return false for false expiration', function () {
-      expect(Stash.Item._calculateExpiration_(false)).to.be.false;
+      expect(OnionSkin.Item._calculateExpiration_(false)).to.be.false;
     });
 
     it('should return the time for Date values', function () {
       var date = new Date();
 
-      expect(Stash.Item._calculateExpiration_(date))
+      expect(OnionSkin.Item._calculateExpiration_(date))
         .to.be.equal(date.getTime());
     });
 
     it('should increase Date.now by seconds', function () {
       var date = Date.now() + 100 * 1000;
 
-      expect(Stash.Item._calculateExpiration_(100) - date)
+      expect(OnionSkin.Item._calculateExpiration_(100) - date)
         .to.be.lt(100);
     });
   });
@@ -35,7 +35,7 @@ describe('Stash::Item', function () {
     it('should use SP_NONE as default cache policy', function (done) {
       foo.get().then(function () {
         catching(done, function () {
-          expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+          expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.SP_NONE);
         });
       });
     });
@@ -140,7 +140,7 @@ describe('Stash::Item', function () {
           foo.get()
           .then(function () {
             catching(done, function () {
-              expect(foo.cachePolicy).to.be.equal(Stash.Item.SP_NONE);
+              expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.SP_NONE);
             });
           });
         });
@@ -149,7 +149,7 @@ describe('Stash::Item', function () {
           foo.set('bar', -1).then(function () {
             return foo.lock();
           }).then(function () {
-            return foo.get(Stash.Item.SP_NONE);
+            return foo.get(OnionSkin.Item.SP_NONE);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -163,7 +163,7 @@ describe('Stash::Item', function () {
       context('SP_OLD', function (done) {
         it('should return false if cache is locked', function (done) {
           foo.lock().then(function () {
-            return foo.get(Stash.Item.SP_OLD);
+            return foo.get(OnionSkin.Item.SP_OLD);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -179,7 +179,7 @@ describe('Stash::Item', function () {
           var bar;
 
           foo.set('bar', 100).then(function () {
-            return foo.get(Stash.Item.SP_PRECOMPUTE, 110);
+            return foo.get(OnionSkin.Item.SP_PRECOMPUTE, 110);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -192,7 +192,7 @@ describe('Stash::Item', function () {
             return foo.lock();
           }).then(function () {
             bar = pool.getItem(foo.key);
-            return bar.get(Stash.Item.SP_PRECOMPUTE, 110);
+            return bar.get(OnionSkin.Item.SP_PRECOMPUTE, 110);
           }).then(function () {
             return bar.isMiss();
           }).then(function (missed) {
@@ -208,7 +208,7 @@ describe('Stash::Item', function () {
           foo.set('bar').then(function () {
             return foo.lock();
           }).then(function () {
-            return foo.get(Stash.Item.SP_VALUE, 'baz');
+            return foo.get(OnionSkin.Item.SP_VALUE, 'baz');
           }).then(function (value) {
             catching(done, function () {
               expect(value).to.be.equal('baz');

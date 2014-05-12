@@ -1,5 +1,3 @@
-module.exports = Item;
-
 var Promise = require('bluebird');
 
 function Item(key, pool) {
@@ -208,3 +206,5 @@ Item.prototype.unlock = function () {
     });
   });
 };
+
+module.exports = Item;

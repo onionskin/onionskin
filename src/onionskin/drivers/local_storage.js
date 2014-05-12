@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var Utils = require('./utils');
 
 function LocalStorage (namespace) {
-  this.namespace = namespace || 'stash';
+  this.namespace = namespace || 'onionskin';
 }
 
 LocalStorage.available = typeof localStorage !== 'undefined';

@@ -1,9 +1,9 @@
-var Stash = require('./stash_base');
-Stash.Drivers = {
-  Utils: require('./stash/drivers/utils'),
-  Ephemeral: require('./stash/drivers/ephemeral'),
-  LocalStorage: require('./stash/drivers/local_storage'),
-  IndexedDB: require('./stash/drivers/indexed_db')
+var OnionSkin = require('./onionskin_base');
+OnionSkin.Drivers = {
+  Utils: require('./onionskin/drivers/utils'),
+  Ephemeral: require('./onionskin/drivers/ephemeral'),
+  LocalStorage: require('./onionskin/drivers/local_storage'),
+  IndexedDB: require('./onionskin/drivers/indexed_db')
 };
 
-module.exports = Stash;
+module.exports = OnionSkin;

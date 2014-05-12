@@ -9,16 +9,21 @@
     <script src="../bower_components/mocha/mocha.js"></script>
     <script src="../bower_components/mocha/mocha.js"></script>
     <script src="../bower_components/chai/chai.js"></script>
+    <script src="../dist/onionskin.js"></script>
 
-    <script>mocha.setup('bdd');var expect=chai.expect;</script>
+    <script>
+      mocha.setup('bdd');
+      var expect=chai.expect;
+      var OnionSkin = require('onionskin');
+      console.log(OnionSkin);
+    </script>
 
-    <script src="../dist/stash.js"></script>
-    <script src="stash_test.js"></script>
-    <script src="stash/pool_test.js"></script>
-    <script src="stash/item_test.js"></script>
-    <script src="stash/drivers_test.js"></script>
-    <script src="stash/drivers/utils_test.js"></script>
-    <script src="stash/drivers/local_storage_test.js"></script>
+    <script src="onionskin_test.js"></script>
+    <script src="onionskin/pool_test.js"></script>
+    <script src="onionskin/item_test.js"></script>
+    <script src="onionskin/drivers_test.js"></script>
+    <script src="onionskin/drivers/utils_test.js"></script>
+    <script src="onionskin/drivers/local_storage_test.js"></script>
 
     <script>
       function catching(done, fn) {
@@ -30,7 +35,6 @@
         }
       }
       mocha.checkLeaks();
-      mocha.globals(['Stash']);
       mocha.run();
     </script>
   </body>
