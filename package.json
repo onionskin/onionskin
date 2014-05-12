@@ -1,17 +1,19 @@
 {
-  "name": "stash.js",
-  "version": "1.2.3",
+  "name": "onionskin",
+  "version": "1.0.0",
   "description": "Multilayer Cache Manager for JavaScript",
-  "main": "src/stash.js",
+  "main": "src/onionskin.js",
   "scripts": {
     "test": "mocha -- test/*_test.js test/*/*_test.js test/*/*/*_test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/tadeuzagallo/stash.js.git"
+    "url": "git://github.com/onionskin/onionskin.git"
   },
   "keywords": [
+    "onionskin",
     "stash",
+    "stash.js",
     "cache",
     "manager",
     "library",
@@ -20,12 +22,13 @@
     "redis",
     "memcached",
     "localStorage",
-    "ephemeral"
+    "ephemeral",
+    "indexeddb"
   ],
   "author": "Tadeu Zagallo <tadeuzagallo@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tadeuzagallo/stash.js/issues"
+    "url": "https://github.com/onionskin/onionskin/issues"
   },
   "devDependencies": {
     "chai": "~1.9.1",

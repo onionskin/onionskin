@@ -1,12 +1,13 @@
 {
-  "name": "stash.js",
-  "version": "1.2.3",
+  "name": "onionskin",
+  "version": "1.0.0",
   "authors": [
     "Tadeu Zagallo <tadeuzagallo@gmail.com>"
   ],
   "description": "Multilayer Cache Manager for JavaScript",
   "keywords": [
     "stash",
+    "stash.js",
     "cache",
     "manager",
     "library",
@@ -15,7 +16,8 @@
     "redis",
     "memcached",
     "localStorage",
-    "ephemeral"
+    "ephemeral",
+    "indexeddb"
   ],
   "license": "MIT",
   "ignore": [
