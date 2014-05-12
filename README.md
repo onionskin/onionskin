@@ -1,110 +1,102 @@
-# ![Stash.js](logo/logo.png) Stash.js  #
+# [![OnionSkin](logo/logo.png)](http://onionskin.io) [OnionSkin](http://onionskin.io)  #
 
-[![Build Status](https://travis-ci.org/tadeuzagallo/stash.js.svg?branch=master)](https://travis-ci.org/tadeuzagallo/stash.js) [![Code Climate](https://codeclimate.com/github/tadeuzagallo/stash.js.png?v1.1.0)](https://codeclimate.com/github/tadeuzagallo/stash.js) [![Code Climate Coverage](https://codeclimate.com/github/tadeuzagallo/stash.js/coverage.png?v1.1.0)](https://codeclimate.com/github/tadeuzagallo/stash.js)
-
-Inspired by the [php library](https://github.com/tedivm/Stash), Stash makes it easier to save your data on multiple layers of cache
-
-[Click here](http://rawgit.com/tadeuzagallo/stash.js/master/examples/facebook.html) to see the [Facebook example](https://github.com/tadeuzagallo/stash.js/blob/master/examples/facebook.html) running on [RawGit](http://rawgit.com/)
+OnionSkin is multi-layer cache manager library that works with Node.js and vanilla javascript
 
 ## Installation ##
 
 You can either install via [npm](https://www.npmjs.org)
 
 ```javascript
-$ npm install stash.js
+$ npm install onionskin
 ```
 
 Or via [bower](http://bower.io/)
 
 ```
-$ bower install stash.js
+$ bower install onionskin
 ```
 
-Or you can just grab a copy of the [stash.js](https://raw.githubusercontent.com/tadeuzagallo/stash.js/master/src/stash.js) file
+Or you can just grab a copy of it [here](https://raw.githubusercontent.com/onionskin/onionskin/master/dist/onionskin.js)
 
 ### Basic Usage ###
 
-*Syntax Updated:* in order to add new drivers, I had to replace the old sync syntax, the new one is based on promises, and it now depends on [bluebird](https://github.com/petkaantonov/bluebird)
-
 ```javascript
-// By version 1.2 you should require('stash.js');
-// It is still available on window, but is deprecated and will be removed on version 2.0
-var Stash = require('stash.js');
+// Library is exposed on the browser with browserify for API consistency with node.js
+var OnionSkin = require('onionskin');
 
-// Initialize a stash pool
-var stash = new Stash.Pool();
+// Initialize a pool
+var pool = new OnionSkin();
 
-// Short version  -- with Promise
-
-stash.get('my/key/path').catch(function (err) {
+pool.get('my/key/path').catch(function (err) {
   // Data is either inexistent or expired
   return slowFuncThatReturnsPromise().then(this.save);
 });
-
-// Long Version (stash.get does all of it internally)
-var item = stash.getItem('my/key/path');
-
-item.get().then(function (data) {
-  item.isMiss().then(function (missed) {
-    if (missed) {
-      item.lock(); // Async lock
-      actuallyFetchData(function (data) {
-        item.set(data);
-        callback(data);
-      });
-    } else {
-      callback(data);
-    }
-  });
-});
 ```
 
-You can run the node.js samples on the `examples` folder to see a really basic demo
+## Documentation ##
 
-### Managing drivers ###
+You can find more usage examples at the website's [Getting Started](http://onionskin.io/getting-started) section
+Also there is the [API Documentation](http://onionskin.io/api)
 
-```javascript
-var ephemeral = new Stash.Drivers.Ephemeral();
-var localStorage = new Stash.Drivers.LocalStorage('my-custom-namespace');
-var indexedDB = new Stash.Drivers.IndexedDB('my-custom-dbname');
+## Need help? ##
 
-// Config info available below
-var redis = new Stash.Drivers.Redis(); 
-var memcached = new Stash.Drivers.Memcached();
+You can:
 
-var clientPool = new Stash.Pool([ephemeral, localStorage]); // It reads on this order, and writes in reverse order
-var serverPool = new Stash.Pool([ephemeral, memcached, redis]);
-```
+* Talk to me at [@onionskinjs](http://twitter.com/onionskinjs)
+* Ask a question at [StackOverflow](http://stackoverflow.com)
+* Send me an email at [contact@onionskin.io](mailto:contact@onionskin.io)
 
-### Drivers ###
+## Want to help? ##
 
-Right now there are five drivers
+So you decided you want to help... This is awesome!!!
+Follow this steps and I will be really glad to merge your work and add you to the contributors!
 
-* Ephemeral - runtime only
-* LocalStorage([string namespace]) - saves on browser localStorage - accepts a namespace as optional parameter
-* IndexedDB([string db_name]) - saves on browser indexed database - accepts a database name as optional parameter
-* Memcached - uses [node-memcached](https://github.com/3rd-Eden/node-memcached), the constructor accpets `serverLocations` and `options`, that are passed to the `node-memcached` constructor, info about configuration available [here](https://github.com/3rd-Eden/node-memcached#server-locations)
-* Redis - uses [node-redis](https://github.com/mranney/node_redis/) to store cache on redis, All parameters passed to the constructor will be passed to `redis.createClient()`
+* [Fork](https://help.github.com/articles/fork-a-repo) the project
+* Clone it and create a branch with the name of the feature you intend to add
 
-I should create some extra drivers in a really near future... If you want to contribute with some driver, just fork e send me a pull request, will be happy to merge! =)
+    ```
+    $ git clone git@github.com:username/onionskin.git
+    $ git checkout -b new-feature-name
+    ```
 
-### Invalidation ###
+* Install the dependencies
 
-There are 4 cache policies right now:
+    ```
+    $ bower install # for browser tests
+    $ npm install # for node.js tests
+    ```
 
-* `Stash.Item.SP_NONE` (default): Ignores the `lock`, if an item is expired, `isMiss` will just return `true` anyway
-* `Stash.Item.SP_OLD`: will return the old value and the subsequent `item.isMiss()` calls will return `false` while another instance has the context `lock()`ed
-* `Stash.Item.SP_PRECOMPUTE`: you should call `item.get(Stash.Item.SP_PRECOMPUTE, time)`, where `item.isMiss()` will eventually return `true` for one instance `time` seconds before the cache is expired
-* `Stash.Item.SP_VALUE`: a default `value` should be passed along the `get()` call, this value will be returned if the cache is expired and `lock()`ed
+* Please add tests to your features. 
+  1. Tests run with [Mocha](http://visionmedia.github.io/mocha/) and use [Chai](http://chaijs.com) for expectations.
+  1. Expect is preferred to should due to browser compatibility
+  1. The test folder respect the same structure as the source, you can run the tests through npm:
+    ```
+    $ npm test
+    ```
 
-## TODO ##
+    or run specific tests with mocha:
 
-* IndexedDB and WebSQL drivers
-* maybe MongoDB driver
-* add Benchmarks
-* more examples
 
-## Contact ##
+    ```
+    mocha test/stash/drivers/*.js
+    ```
 
-Feel free to share any doubts, thoughts or even complaints, either on the [issues](https://github.com/tadeuzagallo/stash.js/issues), via [email](mailto:tadeuzagallo@gmail.com) or [send me a tweet](https://twitter.com/tadeuzagallo)!
+    you also can run the tests on browser
 
+
+    ```
+    open test/index.html
+    ```
+* Send me a [pull request](https://help.github.com/articles/using-pull-requests)
+
+## What is coming next ##
+
+* WebSQL, Cassandra, MongoDB [, ... ] drivers
+* Benchmarks
+* More examples
+
+## Contributors ##
+
+This project was created by [@tadeuzagallo](http://twitter.com/tadeuzagallo) inspired by a PHP library
+named [Stash](http://stash.tedivm.com).
+If you want to join just follow the [instructions](#want-to-help), any help will be very welcome.
