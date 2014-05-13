@@ -32,10 +32,10 @@ describe('OnionSkin::Item', function () {
       });
     });
 
-    it('should use SP_NONE as default cache policy', function (done) {
+    it('should use CP_NONE as default cache policy', function (done) {
       foo.get().then(function () {
         catching(done, function () {
-          expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.SP_NONE);
+          expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.CP_NONE);
         });
       });
     });
@@ -135,12 +135,12 @@ describe('OnionSkin::Item', function () {
     });
 
     context('Expired & Locked', function () {
-      context('SP_NONE', function () {
+      context('CP_NONE', function () {
         it('should be the default cache policy', function (done) {
           foo.get()
           .then(function () {
             catching(done, function () {
-              expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.SP_NONE);
+              expect(foo.cachePolicy).to.be.equal(OnionSkin.Item.CP_NONE);
             });
           });
         });
@@ -149,7 +149,7 @@ describe('OnionSkin::Item', function () {
           foo.set('bar', -1).then(function () {
             return foo.lock();
           }).then(function () {
-            return foo.get(OnionSkin.Item.SP_NONE);
+            return foo.get(OnionSkin.Item.CP_NONE);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -160,10 +160,10 @@ describe('OnionSkin::Item', function () {
         });
       });
 
-      context('SP_OLD', function (done) {
+      context('CP_OLD', function (done) {
         it('should return false if cache is locked', function (done) {
           foo.lock().then(function () {
-            return foo.get(OnionSkin.Item.SP_OLD);
+            return foo.get(OnionSkin.Item.CP_OLD);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -174,12 +174,12 @@ describe('OnionSkin::Item', function () {
         });
       });
 
-      context('SP_PRECOMPUTE', function () {
+      context('CP_PRECOMPUTE', function () {
         it('should return true before expiration for a single instance', function (done) {
           var bar;
 
           foo.set('bar', 100).then(function () {
-            return foo.get(OnionSkin.Item.SP_PRECOMPUTE, 110);
+            return foo.get(OnionSkin.Item.CP_PRECOMPUTE, 110);
           }).then(function () {
             return foo.isMiss();
           }).then(function (missed) {
@@ -192,7 +192,7 @@ describe('OnionSkin::Item', function () {
             return foo.lock();
           }).then(function () {
             bar = pool.getItem(foo.key);
-            return bar.get(OnionSkin.Item.SP_PRECOMPUTE, 110);
+            return bar.get(OnionSkin.Item.CP_PRECOMPUTE, 110);
           }).then(function () {
             return bar.isMiss();
           }).then(function (missed) {
@@ -203,12 +203,12 @@ describe('OnionSkin::Item', function () {
         });
       });
 
-      context('SP_VALUE', function () {
+      context('CP_VALUE', function () {
         it('should return the specified value when locked', function (done) {
           foo.set('bar').then(function () {
             return foo.lock();
           }).then(function () {
-            return foo.get(OnionSkin.Item.SP_VALUE, 'baz');
+            return foo.get(OnionSkin.Item.CP_VALUE, 'baz');
           }).then(function (value) {
             catching(done, function () {
               expect(value).to.be.equal('baz');

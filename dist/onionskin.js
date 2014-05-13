@@ -5417,10 +5417,10 @@ function Item(key, pool) {
   this._unload_();
 }
 
-Item.SP_NONE = 1;
-Item.SP_OLD = 2;
-Item.SP_PRECOMPUTE = 4;
-Item.SP_VALUE = 8;
+Item.CP_NONE = 1;
+Item.CP_OLD = 2;
+Item.CP_PRECOMPUTE = 4;
+Item.CP_VALUE = 8;
 
 Item.prototype._unload_ = function () {
   this.value = null;
@@ -5469,7 +5469,7 @@ Item._calculateExpiration_ = function (expiration) {
 
 Item.prototype.get = function (cachePolicy, policyData) {
   var that = this;
-  this.cachePolicy = cachePolicy || Item.SP_NONE;
+  this.cachePolicy = cachePolicy || Item.CP_NONE;
   this.policyData = policyData;
 
   function load(resolve) {
@@ -5485,7 +5485,7 @@ Item.prototype.get = function (cachePolicy, policyData) {
   }
 
   return new Promise(function (resolve) {
-    if (that.cachePolicy & Item.SP_VALUE) {
+    if (that.cachePolicy & Item.CP_VALUE) {
       that.isLocked().then(function (locked) {
         if (locked) {
           resolve(that.policyData);
@@ -5521,10 +5521,10 @@ Item.prototype.isMiss = function () {
   var isMissed = function (locked, resolve) {
     var miss;
 
-    if (locked && (that.cachePolicy & Item.SP_OLD)) {
+    if (locked && (that.cachePolicy & Item.CP_OLD)) {
       miss = false;
     } else if (!locked &&
-               (that.cachePolicy & Item.SP_PRECOMPUTE) &&
+               (that.cachePolicy & Item.CP_PRECOMPUTE) &&
                that.policyData * 1000 >= that.expiration - Date.now()) {
       miss =  true;
     } else {
@@ -5662,13 +5662,20 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
 module.exports = Pool;
 
 },{"./drivers/ephemeral":41,"./item":45,"bluebird":"EjIH/G"}],47:[function(require,module,exports){
+var Item = require('./onionskin/item');
+var Pool = require('./onionskin/pool');
 var OnionSkin = function (drivers) {
   'use strict';
-  return new OnionSkin.Pool(drivers);
+  return new Pool(drivers);
 };
 
-OnionSkin.Item = require('./onionskin/item');
-OnionSkin.Pool = require('./onionskin/pool');
+OnionSkin.Item = Item;
+OnionSkin.Pool = Pool;
+
+OnionSkin.CP_NONE = Item.CP_NONE;
+OnionSkin.CP_OLD = Item.CP_OLD;
+OnionSkin.CP_PRECOMPUTE = Item.CP_PRECOMPUTE;
+OnionSkin.CP_VALUE = Item.CP_VALUE;
 
 module.exports = OnionSkin;
 
