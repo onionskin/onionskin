@@ -1,3 +1,5 @@
+'use strict';
+
 var Promise = require('bluebird');
 
 function Item(key, pool) {
@@ -96,8 +98,8 @@ Item.prototype.get = function (cachePolicy, policyData) {
 };
 
 // alias for better syntax on Pool#get
-Item.prototype.save = function (value) {
-  this.set(value);
+Item.prototype.save = function (value, expiration) {
+  this.set(value, expiration);
   return value;
 };
 

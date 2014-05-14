@@ -5034,7 +5034,9 @@ var ret = {
 
 module.exports = ret;
 
-},{"./es5.js":12,"./global.js":16}],"sFbBrY":[function(require,module,exports){
+},{"./es5.js":12,"./global.js":16}],"onionskin":[function(require,module,exports){
+module.exports=require('sFbBrY');
+},{}],"sFbBrY":[function(require,module,exports){
 var OnionSkin = require('./onionskin_base');
 OnionSkin.Drivers = {
   Utils: require('./onionskin/drivers/utils'),
@@ -5045,9 +5047,7 @@ OnionSkin.Drivers = {
 
 module.exports = OnionSkin;
 
-},{"./onionskin/drivers/ephemeral":41,"./onionskin/drivers/indexed_db":42,"./onionskin/drivers/local_storage":43,"./onionskin/drivers/utils":44,"./onionskin_base":47}],"onionskin":[function(require,module,exports){
-module.exports=require('sFbBrY');
-},{}],41:[function(require,module,exports){
+},{"./onionskin/drivers/ephemeral":41,"./onionskin/drivers/indexed_db":42,"./onionskin/drivers/local_storage":43,"./onionskin/drivers/utils":44,"./onionskin_base":47}],41:[function(require,module,exports){
 module.exports = Ephemeral;
 
 var Promise = require('bluebird');
@@ -5402,6 +5402,8 @@ module.exports = {
 };
 
 },{}],45:[function(require,module,exports){
+'use strict';
+
 var Promise = require('bluebird');
 
 function Item(key, pool) {
@@ -5500,8 +5502,8 @@ Item.prototype.get = function (cachePolicy, policyData) {
 };
 
 // alias for better syntax on Pool#get
-Item.prototype.save = function (value) {
-  this.set(value);
+Item.prototype.save = function (value, expiration) {
+  this.set(value, expiration);
   return value;
 };
 
