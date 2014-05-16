@@ -1,5 +1,5 @@
 # [![OnionSkin](logo/onionskin.png)](http://onionskin.io) [OnionSkin](http://onionskin.io)  #
-[![Build Status](https://travis-ci.org/onionskin/onionskin.svg?branch=master)](https://travis-ci.org/onionskin/onionskin)[![Code Climate](https://codeclimate.com/github/onionskin/onionskin.png)](https://codeclimate.com/github/onionskin/onionskin)[![Code Climate](https://codeclimate.com/github/onionskin/onionskin/coverage.png)](https://codeclimate.com/github/onionskin/onionskin)
+[![NPM version](https://badge.fury.io/js/onionskin.svg)](http://badge.fury.io/js/onionskin) [![Dependency Status](https://david-dm.org/onionskin/onionskin.svg)](https://david-dm.org/onionskin/onionskin) [![Build Status](https://travis-ci.org/onionskin/onionskin.svg?branch=master)](https://travis-ci.org/onionskin/onionskin) [![Code Climate](https://codeclimate.com/github/onionskin/onionskin.png)](https://codeclimate.com/github/onionskin/onionskin) [![Code Climate](https://codeclimate.com/github/onionskin/onionskin/coverage.png)](https://codeclimate.com/github/onionskin/onionskin)
 
 OnionSkin is multi-layer cache manager library that works with Node.js and vanilla javascript
 
