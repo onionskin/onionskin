@@ -1,4 +1,5 @@
 # [![OnionSkin](logo/onionskin.png)](http://onionskin.io) [OnionSkin](http://onionskin.io)  #
+[![Build Status](https://travis-ci.org/onionskin/onionskin.svg?branch=master)](https://travis-ci.org/onionskin/onionskin)
 
 OnionSkin is multi-layer cache manager library that works with Node.js and vanilla javascript
 
