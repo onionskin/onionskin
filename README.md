@@ -35,7 +35,7 @@ pool.get('my/key/path').catch(function (err) {
 
 ## Documentation ##
 
-You can find more usage examples at the website's [Getting Started](http://onionskin.io/getting-started) section
+You can find more usage examples at the website's [Getting Started](http://onionskin.io/#getting-started) section
 Also there is the [API Documentation](http://onionskin.io/api)
 
 ## Need help? ##
