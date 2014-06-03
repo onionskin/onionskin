@@ -58,7 +58,7 @@ describe('OnionSkin::Pool', function () {
 
     it('should allow save on fail', function (done) {
       pool.get('non_existing_key2', function (err) {
-        return this.set('bar');
+        return 'bar';
       }).then(function () {
           return pool.get('non_existing_key2');
       }).then(function (data) {
@@ -80,8 +80,8 @@ describe('OnionSkin::Pool', function () {
     });
 
     it('should automatically unlock the cache after save', function (done) {
-      pool.get('non_existing_key3').catch(function () {
-        return this.save(1);
+      pool.get('non_existing_key3', function () {
+        return 1;
       }).then(function (value) {
         value.should.be.equal(1);
 
@@ -93,8 +93,8 @@ describe('OnionSkin::Pool', function () {
       }).done();
     });
 
-    it.only('should automatically unlock the cache if generation fails', function (done) {
-      pool.get('non_existing_key3').catch(function () {
+    it('should automatically unlock the cache if generation fails', function (done) {
+      pool.get('non_existing_key3', function () {
         throw 'Some error!';
       }).finally(function () {
         this.isLocked().then(function (locked) {
