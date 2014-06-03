@@ -48,9 +48,10 @@ describe('OnionSkin::Pool', function () {
     });
 
     it('should fail if the item isn\'t present', function (done) {
-      pool.get('non_existing_key').then(function (data) {
-        done(new Error('It should have failed', data));
-      }).catch(function () {
+      pool.get('non_existing_key').catch(function () {
+        return 10;
+      }).then(function (data) {
+        data.should.equal(10);
         done();
       });
     });
@@ -78,7 +79,7 @@ describe('OnionSkin::Pool', function () {
       });
     });
 
-    it.only('should automatically unlock the cache after save', function (done) {
+    it('should automatically unlock the cache after save', function (done) {
       pool.get('non_existing_key3').catch(function () {
         return this.save(1);
       }).then(function (value) {
@@ -89,7 +90,19 @@ describe('OnionSkin::Pool', function () {
             locked.should.be.false;
           });
         });
-      });
+      }).done();
+    });
+
+    it.only('should automatically unlock the cache if generation fails', function (done) {
+      pool.get('non_existing_key3').catch(function () {
+        throw 'Some error!';
+      }).finally(function () {
+        this.isLocked().then(function (locked) {
+          catching(done, function () {
+            locked.should.be.false;
+          });
+        });
+      }).done();
     });
   });
 });
