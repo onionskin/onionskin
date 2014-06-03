@@ -78,5 +78,18 @@ describe('OnionSkin::Pool', function () {
       });
     });
 
+    it.only('should automatically unlock the cache after save', function (done) {
+      pool.get('non_existing_key3').catch(function () {
+        return this.save(1);
+      }).then(function (value) {
+        value.should.be.equal(1);
+
+        this.isLocked().then(function (locked) {
+          catching(done, function () {
+            locked.should.be.false;
+          });
+        });
+      });
+    });
   });
 });

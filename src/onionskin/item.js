@@ -99,8 +99,9 @@ Item.prototype.get = function (cachePolicy, policyData) {
 
 // alias for better syntax on Pool#get
 Item.prototype.save = function (value, expiration) {
-  this.set(value, expiration);
-  return value;
+  return this.set(value, expiration).then(function () {
+    return value;
+  });
 };
 
 Item.prototype.set = function (value, expiration) {
