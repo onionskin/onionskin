@@ -32,7 +32,7 @@ describe('OnionSkin::Pool', function () {
     });
   });
 
-  context('#get', function () {
+  context.only('#get', function () {
     it ('should return the key value', function (done) {
       var key = Math.random().toString();
       var value = Math.random().toString();
@@ -48,7 +48,7 @@ describe('OnionSkin::Pool', function () {
     });
 
     it('should fail if the item isn\'t present', function (done) {
-      pool.get('non_existing_key').catch(function () {
+      pool.get('non_existing_key', function () {
         return 10;
       }).then(function (data) {
         data.should.equal(10);
@@ -57,7 +57,7 @@ describe('OnionSkin::Pool', function () {
     });
 
     it('should allow save on fail', function (done) {
-      pool.get('non_existing_key2').catch(function (err) {
+      pool.get('non_existing_key2', function (err) {
         return this.set('bar');
       }).then(function () {
           return pool.get('non_existing_key2');
@@ -70,7 +70,7 @@ describe('OnionSkin::Pool', function () {
 
     it('should automatically lock', function (done) {
       var key = 'pool_get_3';
-      pool.get(key).catch(function (err) {
+      pool.get(key, function (err) {
         pool.getItem(key).isLocked().then(function (locked) {
           catching(done, function () {
             expect(locked).to.be.true;

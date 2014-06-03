@@ -2735,8 +2735,8 @@ return Promise;
 
 };
 
-}).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./any.js":1,"./async.js":2,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":48}],21:[function(require,module,exports){
+}).call(this,require("lppjwH"))
+},{"./any.js":1,"./async.js":2,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"lppjwH":48}],21:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4213,8 +4213,8 @@ else {
 
 module.exports = schedule;
 
-}).call(this,require("/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"./global.js":16,"/usr/local/lib/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":48}],31:[function(require,module,exports){
+}).call(this,require("lppjwH"))
+},{"./global.js":16,"lppjwH":48}],31:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5644,8 +5644,16 @@ Pool.prototype.flush = function () {
   });
 };
 
-Pool.prototype.get = function (key, cachePolicy, policyData) {
+Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
   var item = this.getItem(key);
+
+  if (typeof cachePolicy === 'function') {
+    generator = cachePolicy;
+    cachePolicy = void 0;
+  } else if (typeof policyData === 'function') {
+    generator = policyData;
+    policyData = void 0;
+  }
 
   return new Promise(function (resolve, reject) {
     item.get(cachePolicy, policyData).then(function (data) {
@@ -5658,7 +5666,11 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
         }
       });
     });
-  }).bind(item);
+  }).bind(item).catch(generator).catch(function (err) {
+    item.unlock();
+    console.log(err);
+    throw(err);
+  });
 };
 
 module.exports = Pool;
@@ -5729,8 +5741,11 @@ process.argv = [];
 function noop() {}
 
 process.on = noop;
+process.addListener = noop;
 process.once = noop;
 process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
 process.emit = noop;
 
 process.binding = function (name) {

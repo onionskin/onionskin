@@ -26,8 +26,16 @@ Pool.prototype.flush = function () {
   });
 };
 
-Pool.prototype.get = function (key, cachePolicy, policyData) {
+Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
   var item = this.getItem(key);
+
+  if (typeof cachePolicy === 'function') {
+    generator = cachePolicy;
+    cachePolicy = void 0;
+  } else if (typeof policyData === 'function') {
+    generator = policyData;
+    policyData = void 0;
+  }
 
   return new Promise(function (resolve, reject) {
     item.get(cachePolicy, policyData).then(function (data) {
@@ -40,7 +48,11 @@ Pool.prototype.get = function (key, cachePolicy, policyData) {
         }
       });
     });
-  }).bind(item);
+  }).bind(item).catch(generator).catch(function (err) {
+    item.unlock();
+    console.log(err);
+    throw(err);
+  });
 };
 
 module.exports = Pool;
