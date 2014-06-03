@@ -32,7 +32,7 @@ describe('OnionSkin::Pool', function () {
     });
   });
 
-  context.only('#get', function () {
+  context('#get', function () {
     it ('should return the key value', function (done) {
       var key = Math.random().toString();
       var value = Math.random().toString();
