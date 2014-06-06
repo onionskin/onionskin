@@ -51,8 +51,9 @@ describe('OnionSkin::Pool', function () {
       pool.get('non_existing_key').catch(function () {
         return 10;
       }).then(function (data) {
-        data.should.equal(10);
-        done();
+        catching(done, function () {
+          expect(data).to.be.equal(10);
+        });
       });
     });
 
@@ -83,11 +84,11 @@ describe('OnionSkin::Pool', function () {
       pool.get('non_existing_key3', function () {
         return 1;
       }).then(function (value) {
-        value.should.be.equal(1);
+        expect(value).to.be.equal(1);
 
         this.isLocked().then(function (locked) {
           catching(done, function () {
-            locked.should.be.false;
+            expect(locked).to.be.false;
           });
         });
       }).done();
@@ -99,7 +100,7 @@ describe('OnionSkin::Pool', function () {
       }).finally(function () {
         this.isLocked().then(function (locked) {
           catching(done, function () {
-            locked.should.be.false;
+            expect(locked).to.be.false;
           });
         });
       }).done();
