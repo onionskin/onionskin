@@ -28,9 +28,12 @@ var OnionSkin = require('onionskin');
 // Initialize a pool
 var pool = new OnionSkin();
 
-pool.get('my/key/path').catch(function (err) {
+pool.get('my/key/path', function (err) {
   // Data is either inexistent or expired
-  return slowFuncThatReturnsPromise().then(this.save);
+  return slowFuncThatReturnsPromise();
+}).then(function (value) {
+  // The value that was either on cache or was just generated
+  console.log(value);
 });
 ```
 
@@ -101,3 +104,9 @@ Follow this steps and I will be really glad to merge your work and add you to th
 This project was created by [@tadeuzagallo](http://twitter.com/tadeuzagallo) inspired by a PHP library
 named [Stash](http://stash.tedivm.com) and was originally Stash.js.
 If you want to join just follow the [instructions](#want-to-help), any help will be very welcome.
+
+## Changelog
+
+### 1.0.1
+* The function to generate missing cache should be passed as the last parameter to `pool.get`, although generating cache `Promise.catch` is still supported the cache will never be unlocked if `item.save` or `item.set` are not called.
+* Also when the cache generator function is passed as parameter, there is no need to call either `item.save` or `item.set`, just return the value you want to be cached and it will automatically saved and passed along to the promise chain.
