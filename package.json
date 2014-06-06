@@ -35,7 +35,7 @@
     "mocha": "~1.18.2"
   },
   "dependencies": {
-    "bluebird": "~1.2.4"
+    "bluebird": "~2.0.5"
   },
   "testling": {
     "harness": "mocha-bdd",
