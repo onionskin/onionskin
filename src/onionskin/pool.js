@@ -41,6 +41,10 @@ Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
     return item.isMiss().then(function (missed) {
       if (missed) {
         item.lock();
+        if (!generator) {
+          throw 'Cache is missing';
+        }
+
         return Promise.try(generator)
           .then(function (val) {
             return item.save(val);

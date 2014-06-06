@@ -48,7 +48,7 @@ describe('OnionSkin::Pool', function () {
     });
 
     it('should fail if the item isn\'t present', function (done) {
-      pool.get('non_existing_key', function () {
+      pool.get('non_existing_key').catch(function () {
         return 10;
       }).then(function (data) {
         data.should.equal(10);
