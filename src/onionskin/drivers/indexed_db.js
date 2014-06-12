@@ -81,9 +81,11 @@ IndexedDB.prototype._get = function (key) {
     return new Promise(function (resolve, reject) {
       request.onerror = function (err) {
         reject(err.target.error);
+        db.close();
       };
       request.onsuccess = function () {
         resolve(request.result || null);
+        db.close();
       };
     });
   });
@@ -118,8 +120,12 @@ IndexedDB.prototype.delete = function (key) {
 
         transaction.onerror = function (event) {
           reject(event.target.error);
+          db.close();
         };
-        transaction.oncomplete = resolve;
+        transaction.oncomplete = function () {
+          resolve.apply(this, arguments);
+          db.close();
+        }
       });
     });
   });
@@ -132,9 +138,11 @@ IndexedDB.prototype._delete = function (key) {
       var store = transaction.objectStore('cache');
       transaction.oncomplete = function () {
         resolve();
+        db.close();
       };
       transaction.onerror = function (err) {
         reject(err.target.error);
+        db.close();
       };
       var request = store.delete(key);
     });
