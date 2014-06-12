@@ -1,5 +1,4 @@
 var Promise = require('bluebird');
-Promise.longStackTraces();
 var Utils = require('./utils');
 
 module.exports = IndexedDB;

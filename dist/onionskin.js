@@ -5169,13 +5169,12 @@ Ephemeral.prototype._updateLock = function (key, value) {
 
 },{"./utils":42,"bluebird":"EjIH/G"}],40:[function(require,module,exports){
 var Promise = require('bluebird');
-Promise.longStackTraces();
 var Utils = require('./utils');
 
 module.exports = IndexedDB;
 
 function IndexedDB(namespace) {
-  this.namespace = namespace || 'stash';
+  this.namespace = namespace || 'onionskin';
 
   this.indexedDB = window.indexedDB ||
     window.mozIndexedDB ||
@@ -5711,7 +5710,6 @@ Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
 
   return item.get(cachePolicy, policyData).then(function (data) {
     return item.isMiss().then(function (missed) {
-        console.log(generator);
       if (missed) {
         item.lock();
         if (!generator) {
