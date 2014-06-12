@@ -5,7 +5,7 @@ var Utils = require('./utils');
 module.exports = IndexedDB;
 
 function IndexedDB(namespace) {
-  this.namespace = namespace || 'stash';
+  this.namespace = namespace || 'onionskin';
 
   this.indexedDB = window.indexedDB ||
     window.mozIndexedDB ||
