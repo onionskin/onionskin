@@ -5188,20 +5188,22 @@ function IndexedDB(namespace) {
     window.msIDBKeyRange;
 
   var that = this;
-  this.db = new Promise(function (resolve, reject) {
-    var request = that.indexedDB.open(that.namespace);
-    request.onerror = function (event) {
-      reject(event.target.error);
-    };
-    request.onsuccess = function () {
-      resolve(request.result);
-    };
-    request.onupgradeneeded = function (event) {
-      var db = event.target.result;
-      var objectStore = db.createObjectStore('cache', { keyPath:  'key' });
-      objectStore.createIndex('key', 'key', { unique: true });
-    };
-  }).bind(this);
+  this.db = function () {
+    return new Promise(function (resolve, reject) {
+      var request = that.indexedDB.open(that.namespace);
+      request.onerror = function (event) {
+        reject(event.target.error);
+      };
+      request.onsuccess = function () {
+        resolve(request.result);
+      };
+      request.onupgradeneeded = function (event) {
+        var db = event.target.result;
+        var objectStore = db.createObjectStore('cache', { keyPath:  'key' });
+        objectStore.createIndex('key', 'key', { unique: true });
+      };
+    }).bind(this);
+  };
 }
 
 IndexedDB.available = (function () {
@@ -5222,7 +5224,7 @@ IndexedDB.prototype.put = function (key, value, expiration) {
 };
 
 IndexedDB.prototype._put = function (value) {
-  return this.db.then(function (db) {
+  return this.db().then(function (db) {
     return new Promise(function (resolve, reject) {
       var transaction = db.transaction('cache', 'readwrite');
       var store = transaction.objectStore('cache');
@@ -5245,7 +5247,7 @@ IndexedDB.prototype.get = function (key) {
 };
 
 IndexedDB.prototype._get = function (key) {
-  return this.db.then(function (db) {
+  return this.db().then(function (db) {
     var store = db.transaction('cache').objectStore('cache');
     var request = store.get(key);
     return new Promise(function (resolve, reject) {
@@ -5263,7 +5265,7 @@ IndexedDB.prototype._get = function (key) {
 
 IndexedDB.prototype.delete = function (key) {
   return this._key(key).then(function (k) {
-    return this.db.then(function (db) {
+    return this.db().then(function (db) {
       var transaction = db.transaction('cache', 'readwrite');
       var store = transaction.objectStore('cache');
       var index = store.index('key');
@@ -5302,7 +5304,7 @@ IndexedDB.prototype.delete = function (key) {
 };
 
 IndexedDB.prototype._delete = function (key) {
-  return this.db.then(function (db) {
+  return this.db().then(function (db) {
     return new Promise(function (resolve, reject) {
       var transaction = db.transaction('cache', 'readwrite');
       var store = transaction.objectStore('cache');
@@ -5334,7 +5336,7 @@ IndexedDB.prototype.unlock = function (key) {
 };
 
 IndexedDB.prototype.flush = function () {
-  return this.db.then(function (db) {
+  return this.db().then(function (db) {
     return new Promise(function (resolve, reject) {
       var store = db.transaction('cache', 'readwrite').objectStore('cache');
       var request = store.clear();
