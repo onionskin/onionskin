@@ -127,7 +127,7 @@ IndexedDB.prototype.delete = function (key) {
         transaction.oncomplete = function () {
           resolve.apply(this, arguments);
           db.close();
-        }
+        };
       });
     });
   });
@@ -146,7 +146,7 @@ IndexedDB.prototype._delete = function (key) {
         reject(err.target.error);
         db.close();
       };
-      var request = store.delete(key);
+      store.delete(key);
     });
   });
 };
@@ -172,9 +172,11 @@ IndexedDB.prototype.flush = function () {
       var request = store.clear();
       request.onerror = function (err) {
         reject(err.target.error);
+        db.close();
       };
       request.onsuccess = function () {
         resolve(request.result);
+        db.close();
       };
     });
   });
