@@ -1,6 +1,6 @@
 {
   "name": "onionskin",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Multilayer Cache Manager for JavaScript",
   "main": "src/onionskin.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "mocha": "~1.18.2"
   },
   "dependencies": {
-    "bluebird": "~2.1.0"
+    "bluebird": "~2.2.0"
   },
   "testling": {
     "harness": "mocha-bdd",
