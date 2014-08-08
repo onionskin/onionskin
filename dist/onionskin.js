@@ -517,6 +517,22 @@ CapturedTrace.combine = function CapturedTrace$Combine(current, prev) {
     return ret;
 };
 
+CapturedTrace.protectErrorMessageNewlines = function(stack) {
+    for (var i = 0; i < stack.length; ++i) {
+        if (rtraceline.test(stack[i])) {
+            break;
+        }
+    }
+
+    if (i <= 1) return;
+
+    var errorMessageLines = [];
+    for (var j = 0; j < i; ++j) {
+        errorMessageLines.push(stack.shift());
+    }
+    stack.unshift(errorMessageLines.join("\u0002\u0000\u0001"));
+};
+
 CapturedTrace.isSupported = function CapturedTrace$IsSupported() {
     return typeof captureStackTrace === "function";
 };
@@ -1282,13 +1298,12 @@ var errorObj = util.errorObj;
 var tryCatch1 = util.tryCatch1;
 var yieldHandlers = [];
 
-function promiseFromYieldHandler(value) {
-    var _yieldHandlers = yieldHandlers;
+function promiseFromYieldHandler(value, yieldHandlers) {
     var _errorObj = errorObj;
     var _Promise = Promise;
-    var len = _yieldHandlers.length;
+    var len = yieldHandlers.length;
     for (var i = 0; i < len; ++i) {
-        var result = tryCatch1(_yieldHandlers[i], void 0, value);
+        var result = tryCatch1(yieldHandlers[i], void 0, value);
         if (result === _errorObj) {
             return _Promise.reject(_errorObj.e);
         }
@@ -1298,12 +1313,15 @@ function promiseFromYieldHandler(value) {
     return null;
 }
 
-function PromiseSpawn(generatorFunction, receiver) {
+function PromiseSpawn(generatorFunction, receiver, yieldHandler) {
     var promise = this._promise = new Promise(INTERNAL);
     promise._setTrace(void 0);
     this._generatorFunction = generatorFunction;
     this._receiver = receiver;
     this._generator = void 0;
+    this._yieldHandlers = typeof yieldHandler === "function"
+        ? [yieldHandler].concat(yieldHandlers)
+        : yieldHandlers;
 }
 
 PromiseSpawn.prototype.promise = function PromiseSpawn$promise() {
@@ -1336,7 +1354,8 @@ PromiseSpawn.prototype._continue = function PromiseSpawn$_continue(result) {
     } else {
         var maybePromise = cast(value, void 0);
         if (!(maybePromise instanceof Promise)) {
-            maybePromise = promiseFromYieldHandler(maybePromise);
+            maybePromise =
+                promiseFromYieldHandler(maybePromise, this._yieldHandlers);
             if (maybePromise === null) {
                 this._throw(new TypeError("A value was yielded that could not be treated as a promise"));
                 return;
@@ -1366,14 +1385,16 @@ PromiseSpawn.prototype._next = function PromiseSpawn$_next(value) {
    );
 };
 
-Promise.coroutine = function Promise$Coroutine(generatorFunction) {
+Promise.coroutine =
+function Promise$Coroutine(generatorFunction, options) {
     if (typeof generatorFunction !== "function") {
         throw new TypeError("generatorFunction must be a function");
     }
+    var yieldHandler = Object(options).yieldHandler;
     var PromiseSpawn$ = PromiseSpawn;
     return function () {
         var generator = generatorFunction.apply(this, arguments);
-        var spawn = new PromiseSpawn$(void 0, void 0);
+        var spawn = new PromiseSpawn$(void 0, void 0, yieldHandler);
         spawn._generator = generator;
         spawn._next(void 0);
         return spawn.promise();
@@ -1470,7 +1491,7 @@ if (canEvaluate) {
             var handler = this.callers[total];
             var ret = tryCatch1(handler, void 0, this);
             if (ret === errorObj) {
-                ret._rejectUnchecked(ret.e);
+                promise._rejectUnchecked(ret.e);
             } else if (!promise._tryFollow(ret)) {
                 promise._fulfillUnchecked(ret);
             }
@@ -2455,10 +2476,10 @@ function Promise$_resolveFromResolver(resolver) {
 Promise.prototype._spreadSlowCase =
 function Promise$_spreadSlowCase(targetFn, promise, values, boundTo) {
     var promiseForAll = new PromiseArray(values).promise();
-    promiseForAll._then(function() {
+    var promise2 = promiseForAll._then(function() {
         return targetFn.apply(boundTo, arguments);
-    }, INTERNAL, void 0, APPLY, void 0);
-    promise._follow(promiseForAll);
+    }, void 0, void 0, APPLY, void 0);
+    promise._follow(promise2);
 };
 
 Promise.prototype._callSpread =
@@ -2588,24 +2609,30 @@ function Promise$_attachExtraTrace(error) {
     if (debugging) {
         var promise = this;
         var stack = error.stack;
-        stack = typeof stack === "string"
-            ? stack.split("\n") : [];
+        stack = typeof stack === "string" ? stack.split("\n") : [];
+        CapturedTrace.protectErrorMessageNewlines(stack);
         var headerLineCount = 1;
-
+        var combinedTraces = 1;
         while(promise != null &&
             promise._trace != null) {
             stack = CapturedTrace.combine(
                 stack,
                 promise._trace.stack.split("\n")
-           );
+            );
             promise = promise._traceParent;
+            combinedTraces++;
         }
 
-        var max = Error.stackTraceLimit + headerLineCount;
+        var stackTraceLimit = Error.stackTraceLimit || 10;
+        var max = (stackTraceLimit + headerLineCount) * combinedTraces;
         var len = stack.length;
-        if (len  > max) {
+        if (len > max) {
             stack.length = max;
         }
+
+        if (len > 0)
+            stack[0] = stack[0].split("\u0002\u0000\u0001").join("\n");
+
         if (stack.length <= headerLineCount) {
             error.stack = "(No stack trace)";
         } else {
@@ -3459,7 +3486,7 @@ function makeNodePromisifiedEval(callback, receiver, originalName, fn, suffix) {
             args[i] = fn;                                                    \n\
             [CodeForCall]                                                    \n\
             break;                                                           \n\
-        ".replace(/"[CodeForCall]"/, codeForCall);
+        ".replace("[CodeForCall]", codeForCall);
         return ret;
     }
 
@@ -3530,16 +3557,18 @@ var makeNodePromisified = canEvaluate
     ? makeNodePromisifiedEval
     : makeNodePromisifiedClosure;
 
-function promisifyAll(obj, suffix, filter) {
+function promisifyAll(obj, suffix, filter, promisifier) {
     var suffixRegexp = new RegExp(escapeIdentRegex(suffix) + "$");
     var methods =
         promisifiableMethods(obj, suffix, suffixRegexp, filter);
+
     for (var i = 0, len = methods.length; i < len; i+= 2) {
         var key = methods[i];
         var fn = methods[i+1];
         var promisifiedKey = key + suffix;
-        obj[promisifiedKey] =
-            makeNodePromisified(key, THIS, key, fn, suffix);
+        obj[promisifiedKey] = promisifier === makeNodePromisified
+                ? makeNodePromisified(key, THIS, key, fn, suffix)
+                : promisifier(fn);
     }
     util.toFastProperties(obj);
     return obj;
@@ -3563,10 +3592,13 @@ Promise.promisifyAll = function Promise$PromisifyAll(target, options) {
     if (typeof target !== "function" && typeof target !== "object") {
         throw new TypeError("the target of promisifyAll must be an object or a function");
     }
-    var suffix = Object(options).suffix;
+    options = Object(options);
+    var suffix = options.suffix;
     if (typeof suffix !== "string") suffix = defaultSuffix;
-    var filter = Object(options).filter;
+    var filter = options.filter;
     if (typeof filter !== "function") filter = defaultFilter;
+    var promisifier = options.promisifier;
+    if (typeof promisifier !== "function") promisifier = makeNodePromisified;
 
     if (!util.isIdentifier(suffix)) {
         throw new RangeError("suffix must be a valid identifier");
@@ -3577,12 +3609,12 @@ Promise.promisifyAll = function Promise$PromisifyAll(target, options) {
         var value = target[keys[i]];
         if (keys[i] !== "constructor" &&
             util.isClass(value)) {
-            promisifyAll(value.prototype, suffix, filter);
-            promisifyAll(value, suffix, filter);
+            promisifyAll(value.prototype, suffix, filter, promisifier);
+            promisifyAll(value, suffix, filter, promisifier);
         }
     }
 
-    return promisifyAll(target, suffix, filter);
+    return promisifyAll(target, suffix, filter, promisifier);
 };
 };
 
@@ -3917,30 +3949,31 @@ var util = require("./util.js");
 var tryCatch4 = util.tryCatch4;
 var tryCatch3 = util.tryCatch3;
 var errorObj = util.errorObj;
-var PENDING = {};
 function ReductionPromiseArray(promises, fn, accum, _each) {
     this.constructor$(promises);
-    var currentIndex = -2;
     this._preservedValues = _each === INTERNAL ? [] : null;
+    this._zerothIsAccum = (accum === void 0);
+    this._gotAccum = false;
+    this._reducingIndex = (this._zerothIsAccum ? 1 : 0);
+    this._valuesPhase = undefined;
+
     var maybePromise = cast(accum, void 0);
     var rejected = false;
     var isPromise = maybePromise instanceof Promise;
     if (isPromise) {
         if (maybePromise.isPending()) {
-            currentIndex = -1;
             maybePromise._proxyPromiseArray(this, -1);
         } else if (maybePromise.isFulfilled()) {
             accum = maybePromise.value();
-            currentIndex = 0;
+            this._gotAccum = true;
         } else {
             maybePromise._unsetRejectionIsUnhandled();
             this._reject(maybePromise.reason());
             rejected = true;
         }
     }
-    if (!isPromise && accum !== void 0) currentIndex = 0;
+    if (!(isPromise || this._zerothIsAccum)) this._gotAccum = true;
     this._callback = fn;
-    this._currentIndex = currentIndex;
     this._accum = accum;
     if (!rejected) this._init$(void 0, -5);
 }
@@ -3951,7 +3984,7 @@ function ReductionPromiseArray$_init() {};
 
 ReductionPromiseArray.prototype._resolveEmptyArray =
 function ReductionPromiseArray$_resolveEmptyArray() {
-    if (this._currentIndex !== -1) {
+    if (this._gotAccum || this._zerothIsAccum) {
         this._resolve(this._preservedValues !== null
                         ? [] : this._accum);
     }
@@ -3959,44 +3992,64 @@ function ReductionPromiseArray$_resolveEmptyArray() {
 
 ReductionPromiseArray.prototype._promiseFulfilled =
 function ReductionPromiseArray$_promiseFulfilled(value, index) {
-    var accum;
     var values = this._values;
     if (values === null) return;
     var length = this.length();
-    var currentIndex = this._currentIndex;
-    if (currentIndex > index) return;
     var preservedValues = this._preservedValues;
     var isEach = preservedValues !== null;
-    if (index === 0 && currentIndex === -2) {
-        accum = value;
-        currentIndex = 1;
-        if (length < 2) return this._resolve(void 0);
-        value = values[1];
-    } else if (index > currentIndex) {
-        return;
-    } else if (index === -1 || values[index] === PENDING) {
-        accum = value;
-        currentIndex++;
-        if (currentIndex >= length)
-            return this._resolve(isEach ? preservedValues : accum);
-        value = values[currentIndex];
-    } else {
-        accum = this._accum;
+    var gotAccum = this._gotAccum;
+    var valuesPhase = this._valuesPhase;
+    var valuesPhaseIndex;
+    if (!valuesPhase) {
+        valuesPhase = this._valuesPhase = Array(length);
+        for (valuesPhaseIndex=0; valuesPhaseIndex<length; ++valuesPhaseIndex) {
+            valuesPhase[valuesPhaseIndex] = 0;
+        }
     }
+    valuesPhaseIndex = valuesPhase[index];
+
+    if (index === 0 && this._zerothIsAccum) {
+        if (!gotAccum) {
+            this._accum = value;
+            this._gotAccum = gotAccum = true;
+        }
+        valuesPhase[index] = ((valuesPhaseIndex === 0)
+            ? 1 : 2);
+    } else if (index === -1) {
+        if (!gotAccum) {
+            this._accum = value;
+            this._gotAccum = gotAccum = true;
+        }
+    } else {
+        if (valuesPhaseIndex === 0) {
+            valuesPhase[index] = 1;
+        }
+        else {
+            valuesPhase[index] = 2;
+            if (gotAccum) {
+                this._accum = value;
+            }
+        }
+    }
+    if (!gotAccum) return;
 
     var callback = this._callback;
     var receiver = this._promise._boundTo;
     var ret;
 
-    for (var i = currentIndex; i < length; ++i) {
-        if (i > currentIndex) value = values[i];
+    for (var i = this._reducingIndex; i < length; ++i) {
+        valuesPhaseIndex = valuesPhase[i];
+        if (valuesPhaseIndex === 2) {
+            this._reducingIndex = i + 1;
+            continue;
+        }
+        if (valuesPhaseIndex !== 1) return;
 
+        value = values[i];
         if (value instanceof Promise) {
             if (value.isFulfilled()) {
                 value = value._settledValue;
             } else if (value.isPending()) {
-                this._accum = accum;
-                this._currentIndex = i;
                 return;
             } else {
                 value._unsetRejectionIsUnhandled();
@@ -4009,7 +4062,7 @@ function ReductionPromiseArray$_promiseFulfilled(value, index) {
             ret = tryCatch3(callback, receiver, value, i, length);
         }
         else {
-            ret = tryCatch4(callback, receiver, accum, value, i, length);
+            ret = tryCatch4(callback, receiver, this._accum, value, i, length);
         }
 
         if (ret === errorObj) return this._reject(ret.e);
@@ -4017,9 +4070,7 @@ function ReductionPromiseArray$_promiseFulfilled(value, index) {
         var maybePromise = cast(ret, void 0);
         if (maybePromise instanceof Promise) {
             if (maybePromise.isPending()) {
-                values[i] = PENDING;
-                this._accum = accum;
-                this._currentIndex = i;
+                valuesPhase[i] = 4;
                 return maybePromise._proxyPromiseArray(this, i);
             } else if (maybePromise.isFulfilled()) {
                 ret = maybePromise.value();
@@ -4028,9 +4079,13 @@ function ReductionPromiseArray$_promiseFulfilled(value, index) {
                 return this._reject(maybePromise.reason());
             }
         }
-        accum = ret;
+
+        this._reducingIndex = i + 1;
+        this._accum = ret;
     }
-    this._resolve(isEach ? preservedValues : accum);
+
+    if (this._reducingIndex < length) return;
+    this._resolve(isEach ? preservedValues : this._accum);
 };
 
 function reduce(promises, fn, initialValue, _each) {
@@ -4230,14 +4285,12 @@ SomePromiseArray.prototype._init = function SomePromiseArray$_init() {
         this._resolve([]);
         return;
     }
-    this._init$(void 0, -2);
+    this._init$(void 0, -5);
     var isArrayResolved = isArray(this._values);
     if (!this._isResolved() &&
         isArrayResolved &&
         this._howMany > this._canPossiblyFulfill()) {
-        var message = "(Promise.some) input array contains less than " +
-                        this._howMany  + " promises";
-        this._reject(new RangeError(message));
+        this._reject(this._getRangeError(this.length()));
     }
 };
 
@@ -4308,6 +4361,18 @@ function SomePromiseArray$_addFulfilled(value) {
 SomePromiseArray.prototype._canPossiblyFulfill =
 function SomePromiseArray$_canPossiblyFulfill() {
     return this.length() - this._rejected();
+};
+
+SomePromiseArray.prototype._getRangeError =
+function SomePromiseArray$_getRangeError(count) {
+    var message = "Input array must contain at least " +
+            this._howMany + " items but contains only " + count + " items";
+    return new RangeError(message);
+};
+
+SomePromiseArray.prototype._resolveEmptyArray =
+function SomePromiseArray$_resolveEmptyArray() {
+    this._reject(this._getRangeError(0));
 };
 
 function Promise$_Some(promises, howMany) {
@@ -5297,7 +5362,7 @@ IndexedDB.prototype.delete = function (key) {
         transaction.oncomplete = function () {
           resolve.apply(this, arguments);
           db.close();
-        }
+        };
       });
     });
   });
@@ -5316,7 +5381,7 @@ IndexedDB.prototype._delete = function (key) {
         reject(err.target.error);
         db.close();
       };
-      var request = store.delete(key);
+      store.delete(key);
     });
   });
 };
@@ -5342,9 +5407,11 @@ IndexedDB.prototype.flush = function () {
       var request = store.clear();
       request.onerror = function (err) {
         reject(err.target.error);
+        db.close();
       };
       request.onsuccess = function () {
         resolve(request.result);
+        db.close();
       };
     });
   });
@@ -5718,24 +5785,26 @@ Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
     policyData = void 0;
   }
 
-  return item.get(cachePolicy, policyData).then(function (data) {
-    return item.isMiss().then(function (missed) {
-      if (missed) {
-        item.lock();
-        if (!generator) {
-          throw 'Cache is missing';
-        }
+  return Promise.props({
+    data: item.get(cachePolicy, policyData),
+    missed: item.isMiss()
+  }).then(function (result) {
+    if (result.missed) {
+      item.lock();
 
-        return Promise.try(generator)
-          .then(function (val) {
-            return item.save(val);
-          }).catch(function () {
-            return item.unlock();
-          });
-      } else {
-        return data;
+      if (!generator) {
+        throw 'Cache is missing';
       }
-    });
+
+      return Promise.try(generator)
+        .then(function (val) {
+          return item.save(val);
+        }).catch(function () {
+          return item.unlock();
+        });
+    } else {
+      return result.data;
+    }
   }).bind(item);
 };
 

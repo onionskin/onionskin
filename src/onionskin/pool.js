@@ -37,24 +37,26 @@ Pool.prototype.get = function (key, cachePolicy, policyData, generator) {
     policyData = void 0;
   }
 
-  return item.get(cachePolicy, policyData).then(function (data) {
-    return item.isMiss().then(function (missed) {
-      if (missed) {
-        item.lock();
-        if (!generator) {
-          throw 'Cache is missing';
-        }
+  return Promise.props({
+    data: item.get(cachePolicy, policyData),
+    missed: item.isMiss()
+  }).then(function (result) {
+    if (result.missed) {
+      item.lock();
 
-        return Promise.try(generator)
-          .then(function (val) {
-            return item.save(val);
-          }).catch(function () {
-            return item.unlock();
-          });
-      } else {
-        return data;
+      if (!generator) {
+        throw 'Cache is missing';
       }
-    });
+
+      return Promise.try(generator)
+        .then(function (val) {
+          return item.save(val);
+        }).catch(function () {
+          return item.unlock();
+        });
+    } else {
+      return result.data;
+    }
   }).bind(item);
 };
 
