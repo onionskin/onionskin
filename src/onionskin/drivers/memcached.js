@@ -83,7 +83,7 @@ Memcached.prototype._key = function (key) {
         return path;
       };
 
-      if (count === false) {
+      if (!count) {
         count = Date.now();
         return that._set(path.join('/') + '_ns', count, 0).then(function () {
           return commit(path, key, count);
