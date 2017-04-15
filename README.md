@@ -71,7 +71,7 @@ Follow this steps and I will be really glad to merge your work and add you to th
     ```
 
 * Please add tests to your features. 
-  1. Tests run with [Mocha](http://visionmedia.github.io/mocha/) and use [Chai](http://chaijs.com) for expectations.
+  1. Tests run with [Mocha](http://mochajs.org/) and use [Chai](http://chaijs.com) for expectations.
   1. Expect is preferred to should due to browser compatibility
   1. The test folder respect the same structure as the source, you can run the tests through npm:
     ```
